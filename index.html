@@ -1264,11 +1264,11 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
     </ul>
 
     <div class="sub-gold">Sub-Tab 3 — ⚠️ Drug Interaction Parser</div>
-    <p>Paste the full drug/allergy interaction alert text from the red box in Firenote. The parser identifies Major and Moderate interactions, prioritizes them by severity, and generates care plan language.</p>
+    <p>Paste the full drug/allergy interaction alert text from the red box in Firenote. The parser identifies all interactions regardless of level and generates care plan language for each one.</p>
     <ul class="blist">
       <li>Copy the entire text from Firenote's "Drug/Allergy interactions" alert — do not filter it first.</li>
-      <li>Choose <strong>Summarized</strong> (default) for a priority-sorted list, or <strong>Full Detail</strong> for complete clinical analysis of each interaction.</li>
-      <li>If Major interactions are identified, a <strong>Z91.89 care plan problem</strong> will be required — the parser will flag this.</li>
+      <li>Choose <strong>Summarized</strong> (default) for a concise list of each interaction, or <strong>Full Detail</strong> for complete clinical analysis of each interaction.</li>
+      <li>If any drug-to-drug interactions are identified, a <strong>Z91.89 care plan problem</strong> is required — the parser will flag this.</li>
     </ul>
 
     <div class="alert warning">
@@ -1527,7 +1527,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
       </li>
       <li>
         <span class="icon">🚫</span>
-        <div><strong>Adding a Z91.89 care plan problem when no interactions exist.</strong> Z91.89 is only required if the Drug Interaction Parser identifies Major or Moderate drug-to-drug interactions. If no interactions are found, do not add the care plan problem. If a medication is added later that generates an interaction, add Z91.89 at that point.</div>
+        <div><strong>Adding a Z91.89 care plan problem when no interactions exist.</strong> Z91.89 is only required when drug-to-drug interactions are identified — any level. If no interactions are found, do not add the care plan problem. If a medication is added later that generates any interaction, add Z91.89 at that point.</div>
       </li>
       <li>
         <span class="icon">🚫</span>
@@ -1563,7 +1563,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
         <tr><td>Care Plan Interventions</td><td>Minimum one Assess, one Educate, one Perform per problem. All Perform interventions must be marked "Performed."</td><td>Care Plan</td></tr>
         <tr><td>QAPI Events</td><td>Required for any wound, skin breakdown, or infection present on admission.</td><td>QAPI section</td></tr>
         <tr><td>IDG Coordination</td><td>Required IDG coordination statement must be documented.</td><td>Care Coordination section</td></tr>
-        <tr><td>Drug Interactions (Z91.89)</td><td>Only required if Major or Moderate drug-to-drug interactions are identified. If no interactions are found, no Z91.89 care plan problem is needed. Add it if a new interaction is identified later.</td><td>Care Plan problem list</td></tr>
+        <tr><td>Drug Interactions (Z91.89)</td><td>Required when any drug-to-drug interaction is identified — regardless of level. If no interactions are found, no Z91.89 care plan problem is needed. Add it if a new interaction is identified later.</td><td>Care Plan problem list</td></tr>
       </tbody>
     </table>
 
@@ -1866,7 +1866,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
 <p style="font-size:.87rem;color:var(--text-mid);margin-bottom:6px">A comprehensive drug profile review is required on all new admissions, with medication changes, and with each recertification. This review requires the nurse to assess:</p>
 <ul class="blist"><li>Medication appropriateness</li><li>Potential drug-to-drug interactions</li><li>Potential drug allergies</li><li>The need for any laboratory monitoring (e.g., INR monitoring for patients on Coumadin)</li><li>Appropriate medications to consider for deprescribing that are no longer medically necessary</li></ul>
 <table class="dtable"><thead><tr><th>Review Item</th><th>What to Do</th></tr></thead><tbody><tr><td><strong>Care Plan Med Review</strong></td><td>Review the medications listed on the Care Plan and mark each one as Reviewed to document you've reviewed current meds during the visit.<br><br><strong>Reminder:</strong> Identify and document who is responsible for medication administration. Provide education on each medication including purpose, dosing, administration, and potential side effects. Confirm patient/caregiver verbalized understanding.</td></tr><tr><td><strong>Med Interaction Review</strong></td><td>Check for potential interactions. Drug-to-drug interactions and drug allergy items will populate in a red box above the med list. The admission nurse MUST notate each specifically, discuss with the hospice physician, and document the outcome.<br><br>
-<div style="background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:8px 12px;margin:8px 0;font-size:.85rem;color:var(--text)"><strong style="color:var(--green)">✅ No interactions identified?</strong> If the Drug Interaction Parser returns no Major or Moderate drug-to-drug interactions, <strong>no Z91.89 care plan problem is needed</strong> at this time. If a medication is added later that generates a new interaction, add the Z91.89 problem at that point.</div>
+<div style="background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:8px 12px;margin:8px 0;font-size:.85rem;color:var(--text)"><strong style="color:var(--green)">✅ No interactions identified?</strong> If the Drug Interaction Parser returns no drug-to-drug interactions of any level, <strong>no Z91.89 care plan problem is needed</strong> at this time. If a medication is added later that generates any interaction, add the Z91.89 problem at that point.</div>
 <strong style="color:var(--navy)">If drug-to-drug interactions ARE identified, add the following care plan problem:</strong><br><br>
 <span style="color:var(--purple);font-weight:700">Problem:</span> Z91.89 — Other Personal Risk Factors, Not Elsewhere Classified<br>
 <span style="color:var(--purple);font-weight:700">Goal:</span> Patient will remain free from adverse medication effects as measured by absence of observed signs/symptoms of medication-related complications, safe and appropriate medication regimen, and ongoing monitoring and timely intervention for identified risks by end of the current benefit period.<br><br>
@@ -7758,7 +7758,7 @@ function parseInteractions() {
   if (current) interactions.push(current);
 
   if (interactions.length === 0) {
-    alert('No drug interactions found. Make sure you pasted the full text from the Firenote red box including the "Major/Moderate/Minor Drug Interaction" header lines.');
+    alert('No drug interactions found. Make sure you pasted the full text from the Firenote red box including all interaction header lines.');
     return;
   }
 
