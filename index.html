@@ -338,9 +338,8 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
   </div>
   <div class="tab-bar">
     <div class="tab-inner">
-      <button class="tab-btn active" onclick="switchTab('guide',this)">📖 User Guide</button>
       <button class="tab-btn" onclick="switchTab('walkthrough',this)">📋 Assessment Walkthrough</button>
-      <button class="tab-btn" onclick="switchTab('checklist',this)">✅ Admission Checklist</button>
+      <button class="tab-btn active" onclick="switchTab('checklist',this)">✅ Admission Checklist</button>
       <button class="tab-btn" onclick="switchTab('meds',this)">💊 Medication Coverage</button>
       <button class="tab-btn" onclick="switchTab('rel',this)">🔗 Diagnosis Relatedness</button>
       <button class="tab-btn" onclick="switchTab('checker',this)">🧠 Clinical Checkers</button>
@@ -348,6 +347,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
       <button class="tab-btn" onclick="switchTab('narrative',this)">✍️ Narrative Strengthener</button>
       <button class="tab-btn" onclick="switchTab('icd',this)">🔎 ICD-10 Reference</button>
       <button class="tab-btn" onclick="switchTab('sample',this)">📄 Sample Admission</button>
+      <button class="tab-btn" onclick="switchTab('guide',this)">📖 User Guide</button>
     </div>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
@@ -851,7 +851,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
   .qtable { font-size: .78rem; }
 }
 </style>
-<div class="panel active" id="panel-guide">
+<div class="panel" id="panel-guide">
 <div style="max-width:1080px;margin:0 auto">
 <div class="page-wrap">
 
@@ -1177,7 +1177,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
     <ul class="blist">
       <li><strong>Non-formulary medications</strong> require prior authorization or substitution — document all attempts, alternatives offered, and the outcome in the narrative.</li>
       <li><strong>Deprescribing</strong> is expected at admission. Every medication on the list should be reviewed for whether it serves a comfort or quality-of-life purpose at end of life. Preventive medications (statins, bisphosphonates, many diabetes medications) are rarely appropriate in hospice.</li>
-      <li><strong>Drug interactions with Z91.89:</strong> If you document a drug interaction concern, a care plan problem must be created using code Z91.89 with appropriate goal and interventions.</li>
+      <li><strong>Drug interactions with Z91.89:</strong> If any drug-to-drug interactions are identified, add a Z91.89 care plan problem. Use the Drug Interaction Parser — it generates the 3 standard interventions plus one combined Monitor For intervention listing all interactions grouped by severity level, and a copyable MD notification comment to paste on that intervention.</li>
     </ul>
 
     <p>For live medication coverage analysis, use the <strong>🧠 Clinical Checkers → Medication Coverage</strong> sub-tab.</p>
@@ -1264,11 +1264,11 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
     </ul>
 
     <div class="sub-gold">Sub-Tab 3 — ⚠️ Drug Interaction Parser</div>
-    <p>Paste the full drug/allergy interaction alert text from the red box in Firenote. The parser identifies all interactions regardless of level and generates care plan language for each one.</p>
+    <p>Paste the full drug/allergy interaction alert text from the red box in Firenote, enter the physician name, date, and their response. The parser generates the Z91.89 problem, goal, 3 standard interventions, one combined Monitor For intervention with all interactions grouped by severity level (Major → Moderate → Minor), and a copyable MD notification comment to paste on the intervention in Firenote.</p>
     <ul class="blist">
       <li>Copy the entire text from Firenote's "Drug/Allergy interactions" alert — do not filter it first.</li>
       <li>Choose <strong>Summarized</strong> (default) for a concise list of each interaction, or <strong>Full Detail</strong> for complete clinical analysis of each interaction.</li>
-      <li>If any drug-to-drug interactions are identified, a <strong>Z91.89 care plan problem</strong> is required — the parser will flag this.</li>
+      <li>If any drug-to-drug interactions are identified, a <strong>Z91.89 care plan problem</strong> is required — the parser generates all interventions automatically plus a copyable MD notification comment.</li>
     </ul>
 
     <div class="alert warning">
@@ -1326,7 +1326,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
         <div class="wf-num">5</div>
         <div class="wf-content">
           <div class="wf-title">Click "Generate Care Plan" — review, edit, copy</div>
-          <div class="wf-desc">Review the generated output. Each section has its own <strong>📋 Copy Section</strong> button, and each individual intervention has a <strong>📋 Copy</strong> button — paste each one directly into the corresponding field in Firenote. Use <strong>📋 Copy All</strong> to copy the full output at once. Always edit any language that doesn't reflect your actual patient before saving.</div>
+          <div class="wf-desc">Review the generated output. The <strong>Goal</strong> section has a <strong>📋 Copy</strong> button, and each individual intervention has its own <strong>📋 Copy</strong> button — paste each one directly into the corresponding field in Firenote. Use <strong>📋 Copy All</strong> to copy the full output at once. Always edit any language that doesn't reflect your actual patient before saving.</div>
         </div>
       </div>
     </div>
@@ -1865,19 +1865,27 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
 <div class="sub-navy" style="margin-top:12px">Drug Profile Review</div>
 <p style="font-size:.87rem;color:var(--text-mid);margin-bottom:6px">A comprehensive drug profile review is required on all new admissions, with medication changes, and with each recertification. This review requires the nurse to assess:</p>
 <ul class="blist"><li>Medication appropriateness</li><li>Potential drug-to-drug interactions</li><li>Potential drug allergies</li><li>The need for any laboratory monitoring (e.g., INR monitoring for patients on Coumadin)</li><li>Appropriate medications to consider for deprescribing that are no longer medically necessary</li></ul>
-<table class="dtable"><thead><tr><th>Review Item</th><th>What to Do</th></tr></thead><tbody><tr><td><strong>Care Plan Med Review</strong></td><td>Review the medications listed on the Care Plan and mark each one as Reviewed to document you've reviewed current meds during the visit.<br><br><strong>Reminder:</strong> Identify and document who is responsible for medication administration. Provide education on each medication including purpose, dosing, administration, and potential side effects. Confirm patient/caregiver verbalized understanding.</td></tr><tr><td><strong>Med Interaction Review</strong></td><td>Check for potential interactions. Drug-to-drug interactions and drug allergy items will populate in a red box above the med list. The admission nurse MUST notate each specifically, discuss with the hospice physician, and document the outcome.<br><br>
-<div style="background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:8px 12px;margin:8px 0;font-size:.85rem;color:var(--text)"><strong style="color:var(--green)">✅ No interactions identified?</strong> If the Drug Interaction Parser returns no drug-to-drug interactions of any level, <strong>no Z91.89 care plan problem is needed</strong> at this time. If a medication is added later that generates any interaction, add the Z91.89 problem at that point.</div>
-<strong style="color:var(--navy)">If drug-to-drug interactions ARE identified, add the following care plan problem:</strong><br><br>
+<table class="dtable"><thead><tr><th>Review Item</th><th>What to Do</th></tr></thead><tbody><tr><td><strong>Care Plan Med Review</strong></td><td>Review the medications listed on the Care Plan and mark each one as Reviewed to document you've reviewed current meds during the visit.<br><br><strong>Reminder:</strong> Identify and document who is responsible for medication administration. Provide education on each medication including purpose, dosing, administration, and potential side effects. Confirm patient/caregiver verbalized understanding.</td></tr><tr><td><strong>Med Interaction Review</strong></td><td>Check for potential interactions. Drug-to-drug interactions and drug allergy items will populate in a red box above the med list. The admission nurse MUST review each interaction, discuss with the hospice physician, and document the outcome. Use the Drug Interaction Parser (Clinical Checkers tab) to generate the Z91.89 care plan with one Monitor For intervention covering all interactions. After marking the intervention <strong>Performed</strong>, click the <strong>comment bubble</strong> next to Performed and paste the MD Notification Comment generated by the parser.<br><br>
+<div style="background:var(--green-bg);border:1px solid var(--green);border-radius:6px;padding:8px 12px;margin:8px 0;font-size:.85rem;color:var(--text)"><strong style="color:var(--green)">✅ No interactions identified?</strong> If the Firenote medication tab shows a <strong>green box</strong> (no interactions identified), <strong>no Z91.89 care plan problem is needed</strong> at this time. If a medication is added later that changes the box to red, add the Z91.89 problem at that point using the Drug Interaction Parser in the Clinical Checkers tab.</div>
+<strong style="color:var(--navy)">If the Firenote medication tab shows a red box (drug-to-drug interactions identified), use the Drug Interaction Parser in the Clinical Checkers tab:</strong><br><br>
 <span style="color:var(--purple);font-weight:700">Problem:</span> Z91.89 — Other Personal Risk Factors, Not Elsewhere Classified<br>
 <span style="color:var(--purple);font-weight:700">Goal:</span> Patient will remain free from adverse medication effects as measured by absence of observed signs/symptoms of medication-related complications, safe and appropriate medication regimen, and ongoing monitoring and timely intervention for identified risks by end of the current benefit period.<br><br>
-<span style="color:var(--purple);font-weight:700">Interventions:</span><br>
-• Review medication profile for: Drug-to-drug interactions | Duplicate therapies | Allergy risks<br>
-• Reconcile medications at each visit and with any medication change<br>
-• Educate patient/caregiver on: Purpose of medications, potential side effects and interactions, and when to report symptoms<br>
-• <em>For each interaction identified — copy and paste from the red box in the med list:</em><br>
-&nbsp;&nbsp;Alert physician of potential for: [Interaction name and medications]<br>
-&nbsp;&nbsp;Monitor for: [Interaction details and clinical risk]<br><br>
-<span style="background:var(--amber-bg);padding:4px 8px;border-radius:4px;font-size:.85rem;color:#7a4200"><strong>Important:</strong> Document physician reply in the comment field when received. Once physician has responded, the "Alert physician" intervention may be discontinued — keep "Monitor for" active. Do NOT discontinue "Monitor for" unless the interaction alert disappears because the medication was discontinued.</span>
+<span style="color:var(--purple);font-weight:700">Standard Interventions (always added — 3 total):</span><br>
+• Nurse will review medication profile at each visit for drug-to-drug interactions, duplicate therapies, and allergy risks.<br>
+• Nurse will reconcile medications at each visit and with any medication change.<br>
+• Nurse will educate patient/caregiver on purpose of medications, potential side effects and interactions, and when to report symptoms.<br><br>
+<span style="color:var(--purple);font-weight:700">Interaction Intervention — one combined intervention (Step 4):</span><br>
+A single <strong>Monitor For</strong> intervention is added that lists all identified interactions grouped by severity level (Major → Moderate → Minor). All interactions are documented in one intervention — not individually.<br><br>
+<span style="color:var(--purple);font-weight:700">MD Notification Comment (Step 5 — not an intervention):</span><br>
+The parser generates a short copyable comment to document the physician notification. To use it in Firenote:<br>
+1. Add the Monitor For intervention to the care plan<br>
+2. Click <strong>Performed</strong> on that intervention<br>
+3. Click the <strong>comment bubble icon</strong> next to Performed<br>
+4. Paste the MD Notification Comment text into the comment field<br><br>
+Format: <em>Drug/Allergy interactions reviewed with Dr. [Name] on [Date]. [Physician response]. [Level] Drug Interaction - [Drug 1] and [Drug 2]...</em><br><br>
+The parser generates this automatically when you enter the physician name, date, and their response before parsing.<br><br>
+Keep the Monitor For intervention active unless the medication causing the interaction is discontinued and the alert clears from Firenote.<br><br>
+<span style="background:#eef3fb;padding:4px 8px;border-radius:4px;font-size:.85rem;color:#1e3a8a"><strong>💡 Tip:</strong> Use the Drug Interaction Parser in the Clinical Checkers tab — paste the full text from the Firenote red box, fill in the physician name, date, and response, and it generates all 4 interventions plus the MD comment, each with its own Copy button.</span>
 </td></tr><tr><td><strong>Duplicate Med Review</strong></td><td>Identify and remove duplicate medication entries (often patient-reported meds that duplicate covered or encounter-ordered meds) to avoid confusion.</td></tr></tbody></table>
 
 <div class="sub-navy" style="margin-top:12px">Bereavement Risk Evaluation for Family / Caregivers</div>
@@ -2070,6 +2078,14 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
 <p style="font-size:.87rem;color:var(--text-mid);margin:6px 0">Each event type opens its own specific reporting tool that must be completed. The following QAPI events must also be reflected in the patient's care plan:</p>
 <ul class="blist"><li>Falls → Fall Risk Care Plan</li><li>Wound → Specific Care Plan per wound (includes wound orders, supplies, and interventions)</li><li>Infections</li></ul>
 
+<div style="margin-top:14px;padding:10px 14px;background:var(--gold-pale);border:1px solid rgba(201,151,44,.3);border-radius:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+  <span style="font-size:.82rem;font-weight:600;color:var(--navy)">Ready to work on the care plan or check drug interactions?</span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a href="#" onclick="switchTab('checker',document.querySelector('[onclick*=checker]'));setTimeout(()=>{document.querySelectorAll('.checker-tab')[2]&&document.querySelectorAll('.checker-tab')[2].click()},200);return false;" style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:var(--navy);color:#fff;border-radius:5px;font-size:.8rem;font-weight:600;text-decoration:none">🧠 Drug Interaction Parser</a>
+    <a href="#" onclick="switchTab('careplan',document.querySelector('[onclick*=careplan]'));return false;" style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:var(--navy);color:#fff;border-radius:5px;font-size:.8rem;font-weight:600;text-decoration:none">📋 Care Plan Builder</a>
+  </div>
+</div>
+
   </div></div>
 </div>
 <div class="card" id="w6">
@@ -2110,6 +2126,11 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
 <div class="chk-item"><div class="chk-box"></div><div class="chk-text"><strong>Document how the patient transfers</strong><span class="note">e.g., stand-by assist, 1-person assist, mechanical lift, bed-bound/no transfer</span></div></div>
 <div class="chk-item"><div class="chk-box"></div><div class="chk-text"><strong>No interventions requiring intake/output documentation</strong><span class="note">Unless specifically ordered by the physician</span></div></div>
 <div class="chk-item"><div class="chk-box"></div><div class="chk-text"><strong>Nothing ordered as PRN and no frequency ranges are allowed</strong></div></div>
+
+<div style="margin-top:14px;padding:10px 14px;background:var(--gold-pale);border:1px solid rgba(201,151,44,.3);border-radius:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+  <span style="font-size:.82rem;font-weight:600;color:var(--navy)">Need help building a care plan goal and interventions?</span>
+  <a href="#" onclick="switchTab('careplan',document.querySelector('[onclick*=careplan]'));return false;" style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:var(--navy);color:#fff;border-radius:5px;font-size:.8rem;font-weight:600;text-decoration:none">📋 Open Care Plan Builder</a>
+</div>
 
   </div></div>
 </div>
@@ -2318,7 +2339,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
 <!-- ══════════════════════════════════════════════════════════════════
      PANEL 2 — CHECKLIST
 ══════════════════════════════════════════════════════════════════ -->
-<div class="panel" id="panel-checklist">
+<div class="panel active" id="panel-checklist">
 <div class="container">
 <div class="panel-search-wrap"><span class="panel-search-icon">🔍</span><input type="text" id="checkSearch" placeholder="Search the checklist... (e.g. medications, wound, QAPI, volunteer)"><button class="panel-search-clear" id="checkSearchClear" title="Clear">✕</button></div>
 <button class="print-btn" onclick="window.print()" style="margin-bottom:12px">🖨 Print This Section</button>
@@ -2357,7 +2378,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
     <div class="sec-num">1</div>
     <div class="sec-bar">
       <h3>Admitting MD Contact</h3><div class="ssub">Call required before or during visit</div>
-      <span class="sec-badge" id="b_cs1">0 / 6</span><span class="sec-chevron">▼</span>
+      <span class="sec-badge" id="b_cs1">0 / 7</span><span class="sec-chevron">▼</span>
     </div>
   </div>
   <div class="sec-body"><div class="sec-inner">
@@ -2365,9 +2386,9 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Verbal order for admission</strong> from hospice physician</div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Verbal certification of terminal illness</strong><span class="note">Physician certifies ≤ 6 months — document in narrative and on CTI within 48 hours. <strong>Transfer patients from another hospice: a new verbal certification is not required — the transferring hospice's certification carries over.</strong></span></div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>RN admission narrative copied into "Nursing Narrative (RN)" tab on Verbal Certification page</strong><span class="note">Verbal Certification page → "Nursing Narrative (RN)" tab → paste full admission narrative. Attaches your clinical documentation to the CTI for the physician's attestation.</span></div><span class="tag req">REQ</span></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Primary hospice diagnosis confirmed</strong> with MD agreement</div></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Related vs. non-related diagnoses reviewed</strong> with MD<span class="note">Mark each accordingly in Firenote</span></div></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Full medication list reviewed</strong> with MD<span class="note">Deprescribing · Formulary substitutions · Covered vs. non-covered · Interactions</span></div></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Primary hospice diagnosis confirmed</strong> with MD agreement</div><span class="tag req">REQ</span></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Related vs. non-related diagnoses reviewed</strong> with MD<span class="note">Mark each accordingly in Firenote</span></div><span class="tag req">REQ</span></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Full medication list reviewed</strong> with MD<span class="note">Deprescribing · Formulary substitutions · Covered vs. non-covered · Interactions</span></div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs1')"><div class="chk-box"></div><div class="chk-text"><strong>Outcome of MD call</strong> documented in nursing narrative</div><span class="tag req">REQ</span></div>
   </div></div>
 </div>
@@ -2403,8 +2424,8 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Every active medication linked to associated diagnosis</div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">All medications entered — interactions reviewed with MD<span class="note">Red box above med list — each item must be addressed and outcome documented</span></div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Covered vs. non-covered determination communicated to family</div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Responsible party for medications documented<span class="note">Caregiver section — who manages; education provided; understanding confirmed</span></div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Patient/family verbalized understanding of medications</div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Responsible party for medications documented<span class="note">Add as intervention under primary DX care plan: identify and document who is responsible, medication education assessed and provided (purpose, dosing, administration, side effects)</span></div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Patient/family verbalized understanding of medications<span class="note">Add as intervention under primary DX care plan and mark Performed: patient/caregiver verbalized understanding of all current medications, purpose, dosing, and potential side effects</span></div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">All performed interventions marked <strong>"Performed"</strong> in care plan</div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Every active problem has ≥ 1 goal and ≥ 3 interventions (Assess · Educate · Perform)</div></div>
       </div>
@@ -2441,12 +2462,12 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
         <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Psych/Social &amp; Spiritual Assessment performed</strong><span class="note">Both required on ALL admissions. Urgent needs communicated to IDG.</span></div></div>
       </div>
       <div class="df-col">
-        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Medication responsibility documented</strong><span class="note">Who manages/administers; education provided; understanding confirmed</span></div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Medication interactions documented</strong> with MD notification and response</div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Medication responsibility documented</strong><span class="note">Add as intervention under primary DX care plan: identify and document who is responsible, medication education assessed and provided (purpose, dosing, administration, side effects). Patient/caregiver verbalized understanding — add as second intervention and mark Performed.</span></div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Medication interactions documented</strong> with MD notification and response<span class="note">If any drug-to-drug interactions exist → Z91.89 care plan required. Use the Drug Interaction Parser in Clinical Checkers. <a href="#" onclick="switchTab('walkthrough',document.querySelector('[onclick*=walkthrough]'));setTimeout(()=>{toggleCard('w5');document.getElementById('w5').scrollIntoView({behavior:'smooth',block:'start'})},250);return false;" style="color:var(--navy);font-weight:600">→ View Drug Profile Review in Walkthrough</a></span></div></div>
         <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>IDG coordination statement</strong> in Coordination of Care section<span class="note">All parties named + agreement with plan of care</span></div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Admission order confirmed</strong> and on care plan</div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Admission order confirmed</strong> and on care plan<span class="note">Add under primary diagnosis care plan problem</span></div></div>
         <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Verbal certification confirmed</strong> and documented within 48 hours<span class="note">Transfer patients from another hospice do not require a new verbal certification.</span></div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Diet order confirmed</strong> and on care plan</div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs3')"><div class="chk-box"></div><div class="chk-text"><strong>Nutrition order confirmed</strong> and on care plan<span class="note">Listed as "Nutrition" in Firenote · Add under primary diagnosis care plan problem</span></div></div>
       </div>
     </div>
     <div class="narr" style="margin-top:8px"><div class="narr-lbl">IDG Statement</div><p>"Coordinated with [Patient], [Family/Caregiver], [Facility Staff], and IDG including [MD], [SW], [Chaplain], [Aide], [Volunteer Coordinator]. All parties in agreement with hospice admission and plan of care."</p></div>
@@ -2459,20 +2480,20 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
     <div class="sec-num">4</div>
     <div class="sec-bar">
       <h3>Before You Close the Visit</h3><div class="ssub">Do not submit until all are confirmed</div>
-      <span class="sec-badge" id="b_cs4">0 / 8</span><span class="sec-chevron">▼</span>
+      <span class="sec-badge" id="b_cs4">0 / 9</span><span class="sec-chevron">▼</span>
     </div>
   </div>
   <div class="sec-body"><div class="sec-inner">
     <div class="exclaim"><div class="exclaim-icon">!</div><div class="exclaim-body">If interventions are not marked <strong>Performed</strong>, Skilled Nursing Performed will be missing and your visit will have no documented clinical value.</div></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Every performed care plan intervention marked "Performed"</strong><span class="note">Scroll through every problem — this single step builds Skilled Nursing Performed</span></div><span class="tag req">REQ</span></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Narrative</strong> reflects all assessments, education, coordination, and skilled tasks</div></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>All orders accurate</strong><span class="note">Admission · Diet · Medications · O2 · Wound care · Catheter</span></div></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Narrative</strong> reflects all assessments, education, coordination, and skilled tasks</div><span class="tag req">REQ</span></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>All orders accurate</strong><span class="note">Admission · Nutrition · Medications · O2 · Wound care · Catheter</span></div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Depression screening</strong> documented in the nursing narrative</div><span class="tag req">REQ</span></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Diagnosis list complete</strong> — Related/Unrelated on every problem</div></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Diagnosis list complete</strong> — Related/Unrelated on every problem</div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>Verbal Certification</strong> entered, dated, and signed <span class="note">Must be obtained within 48 hours of admission. <strong>Exception: Transfer patients from another hospice do not require a new verbal certification — the transferring hospice's certification carries over.</strong></span></div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>RN narrative pasted into "Nursing Narrative (RN)" tab on Verbal Certification page</strong><span class="note">Required — attaches your clinical narrative to the CTI for the physician</span></div><span class="tag req">REQ</span></div>
     <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>QAPI events entered</strong> for wounds or infections present on admission</div><span class="tag req">REQ</span></div>
-    <div class="standalone-chk chk-item" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>HOPE assessment consistent</strong> with care plan, narrative, and medications</div></div>
+    <div class="standalone-chk chk-item crit" onclick="chkItem(this,'cs4')"><div class="chk-box"></div><div class="chk-text"><strong>HOPE assessment consistent</strong> with care plan, narrative, and medications</div><span class="tag req">REQ</span></div>
     <div class="alert tip" style="margin-top:10px"><span>💡</span><div><strong>Final Rule:</strong> Assessment = Care Plan = Narrative = HOPE. Everything must match.</div></div>
   </div></div>
 </div>
@@ -2973,7 +2994,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
 <p class="sample-body">Patient has an identified caregiver. <strong>Primary caregiver [Name], [relationship], identified as responsible for managing and administering all medications.</strong> Caregiver provides assistance several times per week.</p>
 <div class="annot-box req-box">
   <div class="annot-title">■ MANUAL DOCUMENTATION REQUIRED — MEDICATION RESPONSIBLE PERSON</div>
-  <div class="annot-body">Document who is responsible for medications in the Caregiver section or nursing narrative. Include: education provided (purpose, dosing, administration, side effects), and confirm patient/caregiver verbalized understanding. When drug interactions exist, document MD review with specific medications and MD direction.</div>
+  <div class="annot-body">Document who is responsible for medications in the Caregiver section or nursing narrative. Include: education provided (purpose, dosing, administration, side effects), and confirm patient/caregiver verbalized understanding. When drug interactions exist: use the Drug Interaction Parser to generate the Z91.89 care plan and Monitor For intervention. Mark the Monitor For intervention <strong>Performed</strong>, then click the <strong>comment bubble</strong> next to Performed to paste the MD Notification Comment (physician name, date, response, and all identified interactions by level).</div>
 </div>
 <div class="annot-box req-box" style="margin-top:4px">
   <div class="annot-title">ADMISSION DOCUMENTATION CHECKLIST</div>
@@ -3690,12 +3711,22 @@ Non-selective nonsteroidal anti-inflammatory agents (eg, Meloxicam Oral Tablet 7
 Moderate Drug Interaction - Cozaar and Fluconazole
 The pharmacologic effects of losartan may be decreased by CYP2C9 inhibitors (eg, Fluconazole Oral Tablet 150 MG)."></textarea>
       </div>
-      <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center">
-        <button class="checker-btn" id="dip-parse-btn" onclick="parseInteractions()">⚠️ Parse Interactions</button>
-        <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:.8rem;font-weight:700">
-          <button id="dip-mode-summary" onclick="setDipMode('summary')" style="padding:8px 14px;border:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:700;background:var(--navy);color:#fff;transition:all .15s">📝 Summarized</button>
-          <button id="dip-mode-full" onclick="setDipMode('full')" style="padding:8px 14px;border:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:700;background:transparent;color:var(--text-lt);transition:all .15s">📄 Full Detail</button>
+      <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:180px">
+          <label style="font-size:.78rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px">Physician Name <span style="color:#c0392b">*</span></label>
+          <input id="dip-physician" type="text" placeholder="e.g. Dr. Singh" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box">
         </div>
+        <div style="flex:1;min-width:160px">
+          <label style="font-size:.78rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px">Date Reviewed <span style="color:#c0392b">*</span></label>
+          <input id="dip-date" type="date" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box">
+        </div>
+        <div style="flex:2;min-width:200px">
+          <label style="font-size:.78rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px">Physician Response / Orders</label>
+          <input id="dip-response" type="text" placeholder="e.g. No new orders. Continue to monitor." style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+        <button class="checker-btn" id="dip-parse-btn" onclick="parseInteractions()">⚠️ Parse Interactions</button>
         <button class="ai-clear-btn" onclick="clearDrugParser()" style="padding:10px 18px">✕ Clear</button>
       </div>
       <div id="dip-results" style="display:none;margin-top:20px"></div>
@@ -7468,21 +7499,21 @@ function renderCarePlan(text) {
         return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:#eef3fb;border-radius:6px;border-left:3px solid var(--blue)">'
           + '<span style="font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:58px">ASSESS</span>'
           + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(txt) + '</span>'
-          + makeCpBtn('ASSESS — ' + txt, '📋 Copy', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + makeCpBtn(txt, '📋 Copy', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
           + '</div>';
       } else if (lt.startsWith('**EDUCATE**')) {
         const txt = lt.replace(/\*\*EDUCATE\*\*/, '').replace(/^[\s—-]+/, '');
         return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--green-bg);border-radius:6px;border-left:3px solid var(--green)">'
           + '<span style="font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:58px">EDUCATE</span>'
           + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(txt) + '</span>'
-          + makeCpBtn('EDUCATE — ' + txt, '📋 Copy', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + makeCpBtn(txt, '📋 Copy', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
           + '</div>';
       } else if (lt.startsWith('**PERFORM**')) {
         const txt = lt.replace(/\*\*PERFORM\*\*/, '').replace(/^[\s—-]+/, '');
         return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--amber-bg);border-radius:6px;border-left:3px solid var(--gold)">'
           + '<span style="font-size:.72rem;font-weight:700;color:#7a4200;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:58px">PERFORM</span>'
           + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(txt) + '</span>'
-          + makeCpBtn('PERFORM — ' + txt, '📋 Copy', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + makeCpBtn(txt, '📋 Copy', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
           + '</div>';
       } else if (lt === '') {
         return '<div style="margin-top:3px"></div>';
@@ -7492,12 +7523,13 @@ function renderCarePlan(text) {
       }
     }).join('');
 
-    // Section block with header + copy-section button
+    // Section block — Goal section gets a copy button in the header; others just show the title
+    const isGoal = sec.title.toUpperCase() === 'GOAL';
     out.push(
       '<div style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--row-alt);border-bottom:1px solid var(--border)">'
       + '<span style="font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.08em">' + escHtml(sec.title) + '</span>'
-      + makeCpBtn(plainText, '📋 Copy Section', 'padding:4px 12px;')
+      + (isGoal ? makeCpBtn(plainLines.join(' '), '📋 Copy', 'padding:4px 12px;') : '')
       + '</div>'
       + '<div style="padding:10px 12px">' + contentHtml + '</div>'
       + '</div>'
@@ -7520,6 +7552,7 @@ async function runCarePlanBuilder() {
   const goals = document.getElementById('cp-goals').value;
 
   if (!problem) { alert('Please enter a care plan problem or diagnosis.'); return; }
+  if (!goals) { alert('Please select a Goals of Care Direction before generating.'); document.getElementById('cp-goals').focus(); return; }
 
   const btn = document.getElementById('cp-btn');
   const errorEl = document.getElementById('cp-error');
@@ -7613,6 +7646,57 @@ function clearCarePlan() {
   document.getElementById('cp-error').classList.remove('show');
 }
 
+const CP_PRESETS = {
+  dementia: {
+    problem: 'Cognitive decline and behavioral disturbance related to end-stage dementia',
+    primary: 'End-stage dementia (Senile degeneration of the brain / Alzheimer\'s disease)',
+    details: 'Non-verbal patient, unable to participate in assessment. FAST Stage 7. Bedbound, fully dependent for all ADLs. PPS 20–30%. Caregiver (family member) present and providing care at home. No consistent pain verbalization — using PAINAD for non-verbal pain assessment. Agitation and restlessness noted at times.',
+    goals: 'comfort'
+  },
+  chf: {
+    problem: 'Dyspnea and fluid retention related to end-stage congestive heart failure',
+    primary: 'End-stage congestive heart failure (HFrEF / HFpEF)',
+    details: 'Patient with progressive dyspnea at rest, bilateral lower extremity edema, orthopnea. PPS 40–50%. Activity severely limited. On diuretics and comfort-focused cardiac medications. Caregiver in home. Patient able to verbalize symptoms.',
+    goals: 'comfort'
+  },
+  copd: {
+    problem: 'Dyspnea and activity intolerance related to end-stage COPD',
+    primary: 'End-stage chronic obstructive pulmonary disease (COPD)',
+    details: 'Patient with severe dyspnea at rest and with minimal exertion. O2-dependent. PPS 30–40%. Using accessory muscles, pursed-lip breathing noted. Anxious at times related to air hunger. On bronchodilators and PRN nebulizer treatments. Lives with family caregiver.',
+    goals: 'comfort'
+  },
+  cancer: {
+    problem: 'Chronic pain related to end-stage cancer',
+    primary: 'End-stage cancer (specify primary site — e.g., lung adenocarcinoma, colon cancer)',
+    details: 'Patient with moderate to severe pain, currently managed with scheduled opioids and PRN breakthrough dosing. PPS 30–40%. Fatigue, weakness, and decreased oral intake noted. Caregiver present and managing medications. Patient able to verbalize pain — using 0–10 numeric pain scale.',
+    goals: 'comfort'
+  },
+  cva: {
+    problem: 'Functional decline and dysphagia related to end-stage CVA / stroke sequela',
+    primary: 'Sequela of cerebrovascular disease (CVA / stroke)',
+    details: 'Patient with significant neurological deficits following CVA. Hemiplegia/hemiparesis, dysphagia, and aphasia (if applicable). PPS 20–30%. Bedbound or very limited mobility, dependent for all ADLs. At risk for aspiration. Non-verbal or limited verbal communication. Caregiver managing all care.',
+    goals: 'comfort'
+  },
+  renal: {
+    problem: 'Uremic symptoms and fluid/electrolyte imbalance related to end-stage renal disease',
+    primary: 'End-stage renal disease (ESRD) — dialysis discontinued or patient declined',
+    details: 'Patient with end-stage renal disease, dialysis discontinued or declined. Uremic symptoms present including fatigue, nausea, decreased appetite, and altered mentation. PPS 30–40%. Edema present. Patient and family understand comfort-focused goals and have elected to forgo further renal replacement therapy.',
+    goals: 'comfort'
+  }
+};
+
+function cpQuickFill(key) {
+  const p = CP_PRESETS[key];
+  if (!p) return;
+  document.getElementById('cp-problem').value = p.problem;
+  document.getElementById('cp-primary-dx').value = p.primary;
+  document.getElementById('cp-details').value = p.details;
+  const sel = document.getElementById('cp-goals');
+  if (sel) sel.value = p.goals;
+  document.getElementById('cp-output-wrap').classList.remove('show');
+  document.getElementById('cp-error').classList.remove('show');
+}
+
 // ── NARRATIVE STRENGTHENER ─────────────────────────────────────────
 // ── NARRATIVE PROMPT BUILDER (Copilot) ────────────────────────────
 function buildNarrativePrompt() {
@@ -7701,46 +7785,94 @@ function copyOutput(elementId, btn) {
 }
 
 
-// ── DRUG PARSER MODE TOGGLE ────────────────────────────────────────
-window.dipMode = 'summary';
+// ── DRUG INTERACTION PLAIN LANGUAGE TRANSLATOR ────────────────────
+// Maps pharmacology jargon to observable nursing signs/symptoms.
+// Used as fallback when AI translation is unavailable.
+function translateToNursingLanguage(description, drugs) {
+  if (!description) return 'monitor for unusual symptoms or changes in condition; report concerns to physician';
 
-function setDipMode(mode) {
-  window.dipMode = mode;
-  const sumBtn = document.getElementById('dip-mode-summary');
-  const fullBtn = document.getElementById('dip-mode-full');
-  if (mode === 'summary') {
-    sumBtn.style.background = 'var(--navy)';
-    sumBtn.style.color = '#fff';
-    fullBtn.style.background = 'transparent';
-    fullBtn.style.color = 'var(--text-lt)';
-  } else {
-    fullBtn.style.background = 'var(--navy)';
-    fullBtn.style.color = '#fff';
-    sumBtn.style.background = 'transparent';
-    sumBtn.style.color = 'var(--text-lt)';
-  }
-  // Re-parse if results are already showing
-  const results = document.getElementById('dip-results');
-  if (results && results.style.display !== 'none' && results.innerHTML !== '') {
-    parseInteractions();
-  }
-}
+  const d = description.toLowerCase();
+  var findings = [];
 
-function summarizeRisk(firstSentence, severity) {
-  // Use the full first sentence — concise enough without truncating
-  // Just clean up trailing whitespace and ensure it ends cleanly
-  let risk = firstSentence.trim();
-  // Remove trailing period since we add one in the intervention text
-  if (risk.endsWith('.')) risk = risk.slice(0, -1);
-  return risk;
+  // QT / cardiac rhythm
+  if (/qt.{0,20}prolong|torsade|cardiac.arrhythmia|prolonged qt/.test(d))
+    findings.push('irregular heartbeat, palpitations, dizziness, or fainting');
+
+  // Blood pressure / hypotension
+  if (/hypoten|blood pressure.{0,30}lower|lower.{0,30}blood pressure|antihyperten|vasodilat/.test(d))
+    findings.push('low blood pressure, dizziness, lightheadedness, or increased fall risk');
+
+  // Sedation / CNS depression
+  if (/cns.{0,20}depress|sedati|drowsi|somnolen|excessive sleepiness/.test(d))
+    findings.push('excessive drowsiness, confusion, unsteadiness, or slowed breathing');
+
+  // Respiratory depression
+  if (/respirat.{0,20}depress|respirat.{0,20}insufficien/.test(d))
+    findings.push('slow or labored breathing, shallow respirations, or increased sedation');
+
+  // Serotonin syndrome
+  if (/seroton/.test(d))
+    findings.push('agitation, restlessness, rapid heart rate, sweating, tremors, or muscle twitching');
+
+  // Bleeding / anticoagulation
+  if (/bleed|hemorrh|anticoagul|platelet|warfarin|INR/.test(d))
+    findings.push('unusual bruising, prolonged bleeding from cuts, or blood in urine or stool');
+
+  // Opioid / analgesic effect reduced
+  if (/analges|antipyretic/.test(d) && /(reduc|decreas|diminish|impair|delay)/.test(d))
+    findings.push('reduced or delayed pain and fever relief — monitor for return of pain or discomfort');
+
+  // Increased opioid toxicity
+  if (/opioid.{0,20}(toxic|excess|enhanc)|increas.{0,20}opioid/.test(d))
+    findings.push('increased drowsiness, confusion, pinpoint pupils, or slowed breathing');
+
+  // Renal / nephrotoxicity
+  if (/nephrotox|renal.{0,20}(impair|injur|fail|insufficien)|kidney/.test(d))
+    findings.push('decreased urine output, leg or ankle swelling, or increased fatigue');
+
+  // Hepatotoxicity
+  if (/hepatotox|liver.{0,20}(injur|fail|impair)/.test(d))
+    findings.push('yellowing of skin or eyes, dark urine, or upper right abdominal pain');
+
+  // Hyperkalemia
+  if (/hyperkalemi|potassium.{0,20}(increas|elevat|excess)/.test(d))
+    findings.push('muscle weakness, muscle cramps, irregular heartbeat, or numbness and tingling');
+
+  // Hypoglycemia
+  if (/hypoglycemi|blood.{0,10}sugar.{0,20}(low|decreas)/.test(d))
+    findings.push('sweating, shakiness, confusion, weakness, or rapid heartbeat');
+
+  // Anticholinergic
+  if (/anticholinerg/.test(d))
+    findings.push('dry mouth, confusion, urinary retention, constipation, or blurred vision');
+
+  // Drug level / toxicity (generic)
+  if (/toxic|serum.{0,20}level.{0,20}(increas|elevat|high)|increas.{0,20}(concentrat|exposure)/.test(d))
+    findings.push('signs of medication toxicity — report any new or worsening symptoms to physician');
+
+  // Reduced drug effectiveness (generic)
+  if (/(reduc|decreas|diminish|impair).{0,30}(effect|efficacy|action)|(effect|efficacy).{0,30}(reduc|decreas|diminish)/.test(d))
+    findings.push('reduced effectiveness of one or both medications — monitor for return or worsening of symptoms being managed');
+
+  // CYP enzyme interactions (generic — usually means altered drug levels)
+  if (/cyp\d|enzyme.{0,20}(inhibit|induc)|inhibit.{0,20}metabol|metabol.{0,20}(inhibit|decreas|reduc)/.test(d))
+    findings.push('signs that medication levels may be higher or lower than expected — monitor for side effects or reduced effectiveness');
+
+  if (findings.length === 0) {
+    // Generic fallback if no keywords matched
+    findings.push('unusual changes in condition, new symptoms, or changes in mental status; report to physician');
+  }
+
+  // Deduplicate and join
+  var unique = findings.filter(function(v, i, a) { return a.indexOf(v) === i; });
+  return unique.join('; ');
 }
 
 // ── DRUG INTERACTION PARSER ────────────────────────────────────────
-function parseInteractions() {
+async function parseInteractions() {
   const raw = document.getElementById('dip-input').value.trim();
   if (!raw) { alert('Please paste the drug interaction text from Firenote first.'); return; }
 
-  // Parse interactions from pasted text
   const interactions = [];
   const lines = raw.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
   const headerRe = /^(Major|Moderate|Minor)\s+Drug\s+Interaction\s+-\s+(.+)$/i;
@@ -7762,65 +7894,190 @@ function parseInteractions() {
     return;
   }
 
-  // Build results HTML
+  const physician = (document.getElementById('dip-physician').value.trim()) || '[Physician Name]';
+  const dateRaw   = document.getElementById('dip-date').value;
+  const response  = (document.getElementById('dip-response').value.trim()) || 'No new orders.';
+
+  // Format date as M/D/YYYY
+  var dateStr = '[Date]';
+  if (dateRaw) {
+    var dp = dateRaw.split('-');
+    dateStr = parseInt(dp[1]) + '/' + parseInt(dp[2]) + '/' + dp[0];
+  }
+
+  // ── Loading state ─────────────────────────────────────────────
+  const parseBtn = document.getElementById('dip-parse-btn');
+  const origBtnText = parseBtn.textContent;
+  parseBtn.textContent = '⏳ Translating...';
+  parseBtn.disabled = true;
+
   const resultsEl = document.getElementById('dip-results');
   resultsEl.innerHTML = '';
+  resultsEl.style.display = 'block';
 
-  // ── STEP 1: Care Plan Problem ──────────────────────────────────
-  const step1Text = 'Z91.89 — Other Personal Risk Factors, Not Elsewhere Classified';
-  const step1 = buildStepCard('1', 'Care Plan Problem', step1Text, step1Text);
-  resultsEl.appendChild(step1);
+  const loadingEl = document.createElement('div');
+  loadingEl.style.cssText = 'padding:16px;text-align:center;color:var(--navy);font-size:.88rem;font-style:italic';
+  loadingEl.textContent = 'Translating clinical descriptions into nurse-friendly monitoring language...';
+  resultsEl.appendChild(loadingEl);
 
-  // ── STEP 2: Goal ───────────────────────────────────────────────
-  const step2Text = 'Patient will remain free from adverse medication effects as measured by absence of observed signs/symptoms of medication-related complications, safe and appropriate medication regimen, and ongoing monitoring and timely intervention for identified risks by end of the current benefit period.';
-  const step2 = buildStepCard('2', 'Goal', step2Text, step2Text);
-  resultsEl.appendChild(step2);
+  // ── AI translation call ───────────────────────────────────────
+  // Build a single prompt that translates all interaction descriptions at once
+  const interactionList = interactions.map(function(ix, i) {
+    return (i + 1) + '. Drug pair: ' + ix.drugs + '\n   Severity: ' + ix.severity + '\n   Technical description: ' + (ix.description || 'No description available.');
+  }).join('\n\n');
 
-  // ── STEP 3: Standard Interventions (one card per intervention) ──
+  const translatePrompt = `You are a hospice nurse educator. Your job is to translate technical drug interaction descriptions into plain clinical language that a bedside hospice nurse can use to know exactly what signs and symptoms to watch for in a patient.
+
+For each drug interaction below, write a short, clear monitoring phrase (1–2 sentences max) that:
+- Names the specific observable signs or symptoms a nurse should watch for
+- Uses plain nursing language (no pharmacology jargon like "QT interval prolongation", "serotonergic excess", "CYP2C9 inhibition", etc.)
+- Translates those terms into what the nurse will actually SEE or HEAR from the patient (e.g. "QT prolongation" → "irregular heartbeat, palpitations, dizziness, or fainting"; "serotonin syndrome" → "confusion, agitation, rapid heart rate, sweating, muscle twitching, or high fever"; "increased bleeding risk" → "unusual bruising, prolonged bleeding from cuts, or blood in urine or stool")
+- Is written as a fragment starting with the observable symptoms (NOT a full sentence starting with "Nurse will")
+
+Interactions to translate:
+
+${interactionList}
+
+Respond ONLY with a JSON array — no preamble, no markdown, no explanation. Format:
+[
+  {"index": 1, "monitoring": "watch for phrase here"},
+  {"index": 2, "monitoring": "watch for phrase here"}
+]`;
+
+  var translatedMap = {};
+
+  try {
+    const resp = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ prompt: translatePrompt, max_tokens: 1000 })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const rawText = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
+      const clean = rawText.replace(/```json|```/g, '').trim();
+      try {
+        const parsed = JSON.parse(clean);
+        parsed.forEach(function(item) { translatedMap[item.index] = item.monitoring; });
+      } catch(e) { /* fall through to raw descriptions */ }
+    }
+  } catch(e) { /* network error — fall through to raw descriptions */ }
+
+  // Assign translations back to interactions (fallback = keyword translation of raw description)
+  interactions.forEach(function(ix, i) {
+    if (translatedMap[i + 1]) {
+      ix.monitoringText = translatedMap[i + 1];
+    } else {
+      ix.monitoringText = translateToNursingLanguage(ix.description, ix.drugs);
+    }
+  });
+
+  // ── Clear loading, render output ──────────────────────────────
+  parseBtn.textContent = origBtnText;
+  parseBtn.disabled = false;
+  resultsEl.innerHTML = '';
+
+  const sevConfig = {
+    major:    { border: '#c0392b', badge: '#c0392b', badgeBg: '#fde8e8', label: 'Major' },
+    moderate: { border: '#b45309', badge: '#7a4200', badgeBg: '#fef3c7', label: 'Moderate' },
+    minor:    { border: '#2563eb', badge: '#1e3a8a', badgeBg: '#dbeafe', label: 'Minor' }
+  };
+
+  // Group interactions by severity level (preserve order: Major → Moderate → Minor)
+  const grouped = {};
+  const ORDER = ['major', 'moderate', 'minor'];
+  ORDER.forEach(function(k) { grouped[k] = []; });
+  interactions.forEach(function(ix) {
+    const key = ix.severity.toLowerCase();
+    if (grouped[key]) grouped[key].push(ix);
+    else grouped['minor'].push(ix);
+  });
+  const presentLevels = ORDER.filter(function(k) { return grouped[k].length > 0; });
+
+  // ── STEP 1: Care Plan Problem ─────────────────────────────────
+  appendStepCard(resultsEl, '1', 'Care Plan Problem',
+    'Z91.89 — Other Personal Risk Factors, Not Elsewhere Classified');
+
+  // ── STEP 2: Goal ──────────────────────────────────────────────
+  appendStepCard(resultsEl, '2', 'Goal',
+    'Patient will remain free from adverse medication effects as measured by absence of observed signs/symptoms of medication-related complications, safe and appropriate medication regimen, and ongoing monitoring and timely intervention for identified risks by end of the current benefit period.');
+
+  // ── STEP 3: Standard Interventions ───────────────────────────
   const step3Lines = [
-    'Review medication profile for: Drug-to-drug interactions | Duplicate therapies | Allergy risks',
-    'Reconcile medications at each visit and with any medication change',
-    'Educate patient/caregiver on: Purpose of medications, potential side effects and interactions, and when to report symptoms'
+    'Nurse will review medication profile at each visit for drug-to-drug interactions, duplicate therapies, and allergy risks.',
+    'Nurse will reconcile medications at each visit and with any medication change.',
+    'Nurse will educate patient/caregiver on purpose of medications, potential side effects and interactions, and when to report symptoms.'
   ];
-  const step3Wrap = document.createElement('div');
-  step3Wrap.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)';
-  const step3Hdr = document.createElement('div');
-  step3Hdr.style.cssText = 'padding:10px 14px;background:var(--row-alt);border-bottom:1px solid var(--border)';
-  step3Hdr.innerHTML = '<span style="font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em">Step 3 — Standard Interventions</span>';
-  step3Wrap.appendChild(step3Hdr);
-  step3Lines.forEach(function(line) {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)';
-    const txt = document.createElement('div');
-    txt.style.cssText = 'font-size:.88rem;color:var(--text);line-height:1.65;flex:1';
-    txt.textContent = '• ' + line;
-    const btn = document.createElement('button');
-    btn.style.cssText = 'padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0';
-    btn.textContent = '📋 Copy';
-    btn.addEventListener('click', function() { copyText2(line, btn); });
-    row.appendChild(txt);
-    row.appendChild(btn);
-    step3Wrap.appendChild(row);
-  });
-  resultsEl.appendChild(step3Wrap);
+  appendInterventionGroup(resultsEl, '3', 'Standard Interventions', step3Lines);
 
-  // ── STEP 4: One card per interaction ──────────────────────────
-  interactions.forEach(function(ix, idx) {
-    const card = buildInteractionCard(ix, idx);
-    resultsEl.appendChild(card);
+  // ── STEP 4: Single combined Monitor For intervention ──────────
+  // All interactions listed, grouped Major → Moderate → Minor
+  var monitorLines = ['Nurse will monitor patient for signs and symptoms related to the following identified drug-to-drug interactions:\n'];
+  presentLevels.forEach(function(level) {
+    const cfg = sevConfig[level];
+    const ixList = grouped[level];
+    monitorLines.push(cfg.label.toUpperCase() + ':');
+    ixList.forEach(function(ix) {
+      monitorLines.push('• ' + ix.drugs + (ix.monitoringText ? ' — ' + ix.monitoringText : ''));
+    });
+    monitorLines.push('');
   });
+  const monitorText = monitorLines.join('\n').replace(/\n\n$/, '\n').trimEnd();
+  appendStepCard(resultsEl, '4', 'Monitor For — All Interactions (' + interactions.length + ' total)', monitorText);
 
-  // ── Info box ───────────────────────────────────────────────────
+  // ── STEP 5: MD Notification Comment ──────────────────────────
+  // Copyable comment to paste on the Monitor For intervention in Firenote
+  var commentLines = ['Drug/Allergy interactions reviewed with ' + physician + ' on ' + dateStr + '. ' + response];
+  presentLevels.forEach(function(level) {
+    const cfg = sevConfig[level];
+    grouped[level].forEach(function(ix) {
+      commentLines.push(cfg.label + ' Drug Interaction - ' + ix.drugs);
+    });
+  });
+  const commentText = commentLines.join('\n');
+
+  // Render Step 5 as a distinct "comment" card
+  const step5Wrap = document.createElement('div');
+  step5Wrap.style.cssText = 'background:#fff;border:2px dashed #b45309;border-radius:8px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)';
+
+  const step5Hdr = document.createElement('div');
+  step5Hdr.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 14px;background:#fef3c7;border-bottom:1px dashed #b45309';
+
+  const step5Left = document.createElement('div');
+  step5Left.innerHTML = '<div style="font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em">Step 5 — MD Notification Comment</div>'
+    + '<div style="font-size:.75rem;color:#7a4200;margin-top:3px">On the Monitor For intervention: click <strong>Performed</strong>, then click the <strong>comment bubble</strong> next to Performed and paste this text.</div>';
+
+  const step5Btn = document.createElement('button');
+  step5Btn.style.cssText = 'padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0';
+  step5Btn.textContent = '📋 Copy';
+  step5Btn.addEventListener('click', (function(t) { return function() { copyText2(t, step5Btn); }; })(commentText));
+
+  step5Hdr.appendChild(step5Left);
+  step5Hdr.appendChild(step5Btn);
+
+  const step5Body = document.createElement('div');
+  step5Body.style.cssText = 'padding:12px 14px;font-size:.88rem;color:var(--text);line-height:1.7;white-space:pre-wrap';
+  step5Body.textContent = commentText;
+
+  step5Wrap.appendChild(step5Hdr);
+  step5Wrap.appendChild(step5Body);
+  resultsEl.appendChild(step5Wrap);
+
+  // ── Info box ──────────────────────────────────────────────────
   const infoBox = document.createElement('div');
-  infoBox.style.cssText = 'margin-top:16px;padding:14px 16px;background:#eef3fb;border:1px solid #bfdbfe;border-radius:8px;font-size:.84rem;color:#1e3a8a;line-height:1.65';
-  infoBox.innerHTML = '<strong>📋 Documentation Reminder:</strong> After the physician responds, document the reply in the comment field of each <em>Alert physician</em> intervention. Once the physician has responded, that alert intervention may be discontinued — keep the <em>Monitor for</em> intervention active unless the medication causing the interaction is discontinued and the alert disappears from Firenote.';
+  infoBox.style.cssText = 'margin-top:4px;padding:12px 16px;background:#eef3fb;border:1px solid #bfdbfe;border-radius:8px;font-size:.84rem;color:#1e3a8a;line-height:1.65';
+  infoBox.innerHTML = '<strong>📋 4 interventions generated</strong> (Steps 1–4) plus one MD comment (Step 5). '
+    + interactions.length + ' interaction' + (interactions.length !== 1 ? 's' : '') + ' identified across '
+    + presentLevels.length + ' level' + (presentLevels.length !== 1 ? 's' : '') + ' ('
+    + presentLevels.map(function(l) { return sevConfig[l].label; }).join(', ')
+    + '). Keep the Monitor For intervention active unless the medication causing the interaction is discontinued and the alert clears from Firenote.';
   resultsEl.appendChild(infoBox);
 
   resultsEl.style.display = 'block';
   resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function buildStepCard(num, label, displayText, copyText) {
+function appendStepCard(container, num, label, text) {
   const wrap = document.createElement('div');
   wrap.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)';
 
@@ -7832,130 +8089,88 @@ function buildStepCard(num, label, displayText, copyText) {
   title.textContent = 'Step ' + num + ' — ' + label;
 
   const btn = document.createElement('button');
-  btn.style.cssText = 'padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer';
+  btn.style.cssText = 'padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0';
   btn.textContent = '📋 Copy';
-  btn.addEventListener('click', function() { copyText2(copyText, btn); });
+  btn.addEventListener('click', (function(t) { return function() { copyText2(t, btn); }; })(text));
 
   hdr.appendChild(title);
   hdr.appendChild(btn);
 
   const body = document.createElement('div');
   body.style.cssText = 'padding:12px 14px;font-size:.88rem;color:var(--text);line-height:1.7;white-space:pre-wrap';
-  body.textContent = displayText;
+  body.textContent = text;
 
   wrap.appendChild(hdr);
   wrap.appendChild(body);
-  return wrap;
+  container.appendChild(wrap);
 }
 
-function buildInteractionCard(ix, idx) {
-  const severityMap = {
-    major:    { bg: '#fdf2f1', border: 'var(--red)',   badge: '#c0392b', badgeBg: '#fde8e8', label: 'MAJOR' },
-    moderate: { bg: '#fffbf0', border: 'var(--gold)',  badge: '#7a4200', badgeBg: var_amber_bg(), label: 'MODERATE' },
-    minor:    { bg: '#eef3fb', border: '#2563eb',      badge: '#1e3a8a', badgeBg: '#dbeafe', label: 'MINOR' }
-  };
-  const sev = severityMap[ix.severity.toLowerCase()] || severityMap.minor;
+function appendStepCardColored(container, num, label, text, cfg) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:#fff;border:1px solid var(--border);border-left:4px solid ' + cfg.border + ';border-radius:8px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)';
 
-  const card = document.createElement('div');
-  card.style.cssText = 'background:' + sev.bg + ';border:1px solid var(--border);border-left:4px solid ' + sev.border + ';border-radius:8px;margin-bottom:14px;overflow:hidden';
-
-  // Card header
   const hdr = document.createElement('div');
-  hdr.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap';
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:' + cfg.badgeBg + ';border-bottom:1px solid var(--border)';
+
+  const left = document.createElement('div');
+  left.style.cssText = 'display:flex;align-items:center;gap:8px';
 
   const badge = document.createElement('span');
-  badge.style.cssText = 'font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:10px;background:' + sev.badgeBg + ';color:' + sev.badge + ';letter-spacing:.05em';
-  badge.textContent = sev.label;
+  badge.style.cssText = 'font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:8px;background:' + cfg.badgeBg + ';color:' + cfg.badge + ';border:1px solid ' + cfg.border + ';letter-spacing:.05em';
+  badge.textContent = cfg.label.toUpperCase();
 
-  const drugPair = document.createElement('span');
-  drugPair.style.cssText = 'font-weight:700;font-size:.92rem;color:var(--navy)';
-  drugPair.textContent = ix.drugs;
+  const title = document.createElement('span');
+  title.style.cssText = 'font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em';
+  title.textContent = 'Step ' + num + ' — ' + label;
 
-  hdr.appendChild(badge);
-  hdr.appendChild(drugPair);
-  card.appendChild(hdr);
-
-  // Build intervention text based on selected mode
-  const mode = window.dipMode || 'summary';
-  const firstSentence = ix.description.split('.')[0].trim();
-  // Extract a short risk phrase from first sentence
-  const riskSummary = summarizeRisk(firstSentence, ix.severity);
-
-  let intAText, intBText;
-  if (mode === 'full') {
-    intAText = 'Alert physician of potential for: ' + ix.severity + ' Drug Interaction — ' + ix.drugs + '\nInteraction detail: ' + ix.description;
-    intBText = 'Monitor for: ' + ix.severity + ' Drug Interaction — ' + ix.drugs + '\nClinical risk: ' + ix.description;
-  } else {
-    intAText = 'Alert physician of potential for: ' + ix.severity + ' Drug Interaction — ' + ix.drugs + '. Risk: ' + riskSummary + '.';
-    intBText = 'Monitor for: Signs/symptoms of ' + ix.severity + ' Drug Interaction — ' + ix.drugs + '. Watch for: ' + riskSummary + '.';
-  }
-
-  // Intervention A — Alert physician
-  const rowA = buildInterventionRow(
-    'A',
-    'Add, then discontinue after physician responds',
-    intAText,
-    intAText,
-    '#c0392b'
-  );
-  card.appendChild(rowA);
-
-  // Intervention B — Monitor
-  const rowB = buildInterventionRow(
-    'B',
-    'Keep active unless medication discontinued',
-    intBText,
-    intBText,
-    '#1e3a8a'
-  );
-  card.appendChild(rowB);
-
-  return card;
-}
-
-function var_amber_bg() {
-  // Read CSS variable fallback
-  try {
-    return getComputedStyle(document.documentElement).getPropertyValue('--amber-bg').trim() || '#fffbf0';
-  } catch(e) { return '#fffbf0'; }
-}
-
-function buildInterventionRow(letter, sublabel, displayText, copyText, accentColor) {
-  const row = document.createElement('div');
-  row.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--border)';
-
-  const meta = document.createElement('div');
-  meta.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap';
-
-  const lbl = document.createElement('div');
-  lbl.style.cssText = 'display:flex;align-items:center;gap:8px';
-
-  const letterBadge = document.createElement('span');
-  letterBadge.style.cssText = 'font-size:.7rem;font-weight:700;width:20px;height:20px;border-radius:50%;background:' + accentColor + ';color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0';
-  letterBadge.textContent = letter;
-
-  const subLabelEl = document.createElement('span');
-  subLabelEl.style.cssText = 'font-size:.78rem;font-style:italic;color:var(--text-lt)';
-  subLabelEl.textContent = sublabel;
-
-  lbl.appendChild(letterBadge);
-  lbl.appendChild(subLabelEl);
+  left.appendChild(badge);
+  left.appendChild(title);
 
   const btn = document.createElement('button');
-  btn.style.cssText = 'padding:4px 11px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.74rem;font-weight:600;cursor:pointer;flex-shrink:0';
+  btn.style.cssText = 'padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0';
   btn.textContent = '📋 Copy';
-  btn.addEventListener('click', function() { copyText2(copyText, btn); });
+  btn.addEventListener('click', (function(t) { return function() { copyText2(t, btn); }; })(text));
 
-  meta.appendChild(lbl);
-  meta.appendChild(btn);
+  hdr.appendChild(left);
+  hdr.appendChild(btn);
 
-  const text = document.createElement('div');
-  text.style.cssText = 'font-size:.86rem;color:var(--text);line-height:1.65;white-space:pre-wrap;padding-left:28px';
-  text.textContent = displayText;
+  const body = document.createElement('div');
+  body.style.cssText = 'padding:12px 14px;font-size:.88rem;color:var(--text);line-height:1.7;white-space:pre-wrap';
+  body.textContent = text;
 
-  row.appendChild(meta);
-  row.appendChild(text);
-  return row;
+  wrap.appendChild(hdr);
+  wrap.appendChild(body);
+  container.appendChild(wrap);
+}
+
+function appendInterventionGroup(container, num, label, lines) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)';
+
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'padding:10px 14px;background:var(--row-alt);border-bottom:1px solid var(--border)';
+  hdr.innerHTML = '<span style="font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em">Step ' + num + ' — ' + label + '</span>';
+  wrap.appendChild(hdr);
+
+  lines.forEach(function(line) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)';
+
+    const txt = document.createElement('div');
+    txt.style.cssText = 'font-size:.88rem;color:var(--text);line-height:1.65;flex:1';
+    txt.textContent = line;
+
+    const btn = document.createElement('button');
+    btn.style.cssText = 'padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0';
+    btn.textContent = '📋 Copy';
+    btn.addEventListener('click', (function(t) { return function() { copyText2(t, btn); }; })(line));
+
+    row.appendChild(txt);
+    row.appendChild(btn);
+    wrap.appendChild(row);
+  });
+
+  container.appendChild(wrap);
 }
 
 function copyText2(text, btn) {
@@ -7980,8 +8195,10 @@ function copyText2(text, btn) {
 }
 
 function clearDrugParser() {
-  const inp = document.getElementById('dip-input');
-  if (inp) inp.value = '';
+  ['dip-input','dip-physician','dip-date','dip-response'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   const res = document.getElementById('dip-results');
   if (res) { res.innerHTML = ''; res.style.display = 'none'; }
 }
@@ -8042,6 +8259,19 @@ function clearDrugParser() {
   </div>
   <div class="ai-tool-body">
 
+    <div style="margin-bottom:16px">
+      <div style="font-size:.78rem;font-weight:700;color:var(--text-lt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Quick Fill — Common Scenarios</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button type="button" onclick="cpQuickFill('dementia')" style="padding:5px 11px;background:var(--row-alt);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--row-alt)'">🧠 End-Stage Dementia</button>
+        <button type="button" onclick="cpQuickFill('chf')" style="padding:5px 11px;background:var(--row-alt);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--row-alt)'">❤️ End-Stage CHF</button>
+        <button type="button" onclick="cpQuickFill('copd')" style="padding:5px 11px;background:var(--row-alt);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--row-alt)'">🫁 End-Stage COPD</button>
+        <button type="button" onclick="cpQuickFill('cancer')" style="padding:5px 11px;background:var(--row-alt);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--row-alt)'">🎗️ Cancer Pain</button>
+        <button type="button" onclick="cpQuickFill('cva')" style="padding:5px 11px;background:var(--row-alt);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--row-alt)'">🧩 CVA / Stroke</button>
+        <button type="button" onclick="cpQuickFill('renal')" style="padding:5px 11px;background:var(--row-alt);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .14s" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--row-alt)'">🫘 End-Stage Renal</button>
+      </div>
+      <div style="font-size:.74rem;color:var(--text-lt);margin-top:6px;font-style:italic">Click any scenario to pre-fill the fields — edit as needed to match your patient</div>
+    </div>
+
     <div class="ai-field">
       <label>Care Plan Problem / Diagnosis</label>
       <input type="text" id="cp-problem" placeholder="e.g. Chronic pain related to end-stage lung cancer, Dyspnea related to CHF, Anxiety related to terminal diagnosis">
@@ -8061,8 +8291,9 @@ function clearDrugParser() {
 
     <div class="ai-field">
       <label>Goals of Care Direction</label>
-      <select id="cp-goals">
-        <option value="comfort">Comfort / Symptom Management (default hospice focus)</option>
+      <select id="cp-goals" required>
+        <option value="" selected disabled>— Select goals of care direction —</option>
+        <option value="comfort">Comfort / Symptom Management</option>
         <option value="family">Family/Caregiver Support & Education emphasis</option>
         <option value="spiritual">Spiritual / Psychosocial emphasis</option>
         <option value="safety">Safety & Fall Prevention emphasis</option>
