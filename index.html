@@ -2031,8 +2031,51 @@ Keep the Monitor For intervention active unless the medication causing the inter
 <div style="margin-top:4px"></div>
 <div class="obs-row"><div>› Fall Risk <span class="req">★</span></div></div>
 <div class="sub-navy" style="margin-top:8px">Current Fall Risk Level</div>
-<ul class="blist"><li>Known High Risk / Known Moderate Risk / Known Low Risk — select supporting evidence for the identified risk level</li><li>"Assess Falls Risk" — selecting this option opens a fall risk assessment tool that will calculate a fall risk level for you</li></ul>
-<div class="alert info"><span>📝</span><div>Any identified fall risk must be included in the care plan. Common codes:<br>• History of falling: Z91.81 &nbsp;&nbsp;• Abnormalities of gait: R26.89 &nbsp;&nbsp;• Other specified risk factors: Z91.89<br>This may also be care planned under the primary diagnosis or other condition causing the elevated fall risk.</div></div>
+<p style="font-size:.87rem;color:var(--text-mid);margin-bottom:8px">Firenote requires you to select one option. Choose the one that best reflects your clinical assessment of this patient:</p>
+<table class="dtable"><thead><tr><th>Option</th><th>When to Use It</th></tr></thead><tbody>
+<tr><td><strong>Known High Risk</strong></td><td>You have already determined the patient is high risk based on history, current presentation, or prior documentation. Firenote will auto-generate a note that fall interventions should be included in the care plan. Select all supporting evidence that applies.</td></tr>
+<tr><td><strong>Known Moderate Risk</strong></td><td>You have already determined the patient is moderate risk. Firenote will auto-generate a note that fall interventions should be included in the care plan. Select all supporting evidence that applies.</td></tr>
+<tr><td><strong>Known Low Risk</strong></td><td>The patient has no significant fall risk factors at this time. Use only when your clinical assessment supports a genuinely low risk determination.</td></tr>
+<tr><td><strong>Assess Falls Risk</strong></td><td>Use this option when you need to work through the assessment to determine the risk level. Firenote will display the contributing factors you select — <strong>it will not calculate or assign a risk level for you.</strong> You must review the factors selected and apply your clinical judgment to determine and document the appropriate risk level in the narrative or care plan.</td></tr>
+</tbody></table>
+
+<div class="sub-navy" style="margin-top:14px">Clinical Guidance — Determining Fall Risk Level</div>
+<p style="font-size:.87rem;color:var(--text-mid);margin-bottom:8px">Use the following as a guide when the risk level is not already established. Base your determination on the total picture — more risk factors present generally indicates a higher risk level.</p>
+<table class="dtable"><thead><tr><th>Risk Level</th><th>Typical Indicators</th></tr></thead><tbody>
+<tr><td><strong style="color:var(--red)">High Risk</strong></td><td>
+  <ul class="blist" style="margin:0">
+    <li>Documented fall(s) in the last 3 months</li>
+    <li>Altered cognition / confusion / impaired awareness of environment</li>
+    <li>Two or more high-risk medications (opioids, anticonvulsants, antihypertensives, diuretics, hypnotics, laxatives, sedatives, psychotropics)</li>
+    <li>Requires assistance or supervision for mobility, transfer, or ambulation</li>
+    <li>Two or more tethered devices (IV, catheter, O2, etc.)</li>
+    <li>Unsteady gait</li>
+    <li>Multiple risk factors present in combination</li>
+  </ul>
+</td></tr>
+<tr><td><strong style="color:var(--gold)">Moderate Risk</strong></td><td>
+  <ul class="blist" style="margin:0">
+    <li>One high-risk medication present</li>
+    <li>One tethered device</li>
+    <li>Elimination issues (frequency/urgency or incontinence) without other major risk factors</li>
+    <li>Secondary diagnosis present that contributes to fall risk (e.g., neuropathy, weakness)</li>
+    <li>Visual or auditory impairment</li>
+    <li>Age 70+ with one or two additional contributing factors</li>
+  </ul>
+</td></tr>
+<tr><td><strong style="color:var(--green)">Low Risk</strong></td><td>
+  <ul class="blist" style="margin:0">
+    <li>No history of falls in the last 3 months</li>
+    <li>Cognition intact</li>
+    <li>Ambulates independently without assistive device</li>
+    <li>No high-risk medications</li>
+    <li>No tethered devices</li>
+    <li>Minimal or no contributing risk factors identified</li>
+  </ul>
+</td></tr>
+</tbody></table>
+
+<div class="alert info" style="margin-top:10px"><span>📝</span><div>Any identified fall risk (moderate or high) must be included in the care plan. Common codes:<br>• History of falling: Z91.81 &nbsp;&nbsp;• Abnormalities of gait: R26.89 &nbsp;&nbsp;• Other specified risk factors: Z91.89<br>This may also be care planned under the primary diagnosis or other condition causing the elevated fall risk.</div></div>
 
 <div style="margin-top:4px"></div>
 <div class="obs-row"><div>› Caregivers — Primary Caregiver Identification <span class="req">★</span></div></div>
@@ -2409,13 +2452,14 @@ Keep the Monitor For intervention active unless the medication causing the inter
       <div class="df-col">
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Admission order entered <em style="color:var(--text-lt);font-size:.8rem">(Care Plan → Primary Dx)</em></div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Verbal certification documented</div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Diet order entered <em style="color:var(--text-lt);font-size:.8rem">(Care Plan → Primary Dx)</em></div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Nutrition order entered <em style="color:var(--text-lt);font-size:.8rem">(Care Plan → Primary Dx)</em><span class="note">Called "Nutrition" in Firenote — not "Diet"</span></div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">All DME added to care plan<span class="note">Include ALL DME — Hospice ordered, facility provided, and patient owned. Add under the related ICD care plan if applicable (e.g., oxygen equipment → oxygen/respiratory care plan). If not directly related to another ICD, add under primary diagnosis care plan.</span></div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">All supplies added to care plan<span class="note">Include all supplies — adult briefs, wipes, chux, gloves, dressing supplies, etc. Add under the related ICD care plan if applicable. If not directly related to another ICD, add under primary diagnosis care plan.</span></div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Allergies verified</div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Emergency contacts verified</div></div>
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Emergency safety level set <em style="color:var(--text-lt);font-size:.8rem">(Pt Info → Alert Tags)</em></div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">DNR order entered (if applicable)</div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">QAPI event — wound on admission</div></div>
-        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">QAPI event — infection on admission</div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">QAPI event — wound on admission<span class="note">A separate QAPI event is required for each individual wound. If the patient has three wounds, three separate QAPI events must be entered.</span></div></div>
+        <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">QAPI event — infection on admission<span class="note">A separate QAPI event is required for each individual infection. If the patient has both a UTI and a wound infection, two separate QAPI events must be entered.</span></div></div>
       </div>
       <div class="df-col">
         <div class="chk-item" onclick="chkItem(this,'cs2')"><div class="chk-box"></div><div class="chk-text">Primary hospice diagnosis entered and confirmed with MD</div></div>
@@ -3410,7 +3454,7 @@ Keep the Monitor For intervention active unless the medication causing the inter
   </div>
 </div>
 
-<div class="alert info"><span>📋</span><div><strong>Per CMS:</strong> "The hospice is responsible for covering all drugs and biologicals related to the palliation and management of the terminal illness and related conditions, including drugs to manage pain and symptoms." (42 CFR §418.106)<br><br>When a TPE auditor reviews a hospice claim, they will look at every medication in the record and ask: is this covered by hospice, and is it documented why? <strong>Your documentation is the answer.</strong></div></div>
+<div class="alert info"><span>📋</span><div><strong>Per CMS:</strong> "The hospice is responsible for covering all drugs and biologicals related to the palliation and management of the terminal illness and related conditions, including drugs to manage pain and symptoms." (42 CFR §418.106)<br><br>When a TPE auditor reviews a hospice claim, they will look at every medication in the record and ask: is this covered by hospice, and if NOT, is the reason for non-coverage documented? <strong>Your documentation is the answer.</strong></div></div>
 
 </div></div><!-- end panel meds -->
 
