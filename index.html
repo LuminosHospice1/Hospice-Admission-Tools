@@ -13110,6 +13110,8 @@ async function runIcdLookup() {
       resultsEl.appendChild(apiWarn);
     }
   }
+  btn.textContent = origText;
+  btn.disabled = false;
 
   // ── Step 3: Merge local + API results in original order ─────────
   const finalResults = lines.map(function(line) {
@@ -13873,6 +13875,8 @@ function clearIcdLookup() {
   if (res) { res.innerHTML = ''; res.style.display = 'none'; }
   icdLookupResults = [];
   icdPrimaryIdx = -1;
+  const lookupBtn = document.getElementById('icd-lookup-btn');
+  if (lookupBtn) { lookupBtn.textContent = '🔎 Look Up Codes'; lookupBtn.disabled = false; }
 }
 
 </script>
