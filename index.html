@@ -7852,12 +7852,6 @@ function renderCarePlan(text) {
   const out = [];
 
   sections.forEach(function(sec) {
-    // Build plain-text version of section content for copying
-    const plainLines = sec.lines.map(l => {
-      return l.replace(/\*\*([^*]+?)\*\*/g, '$1').trim();
-    }).filter(l => l.length > 0 && !/^-{3,}$/.test(l) && !/^\*{3,}$/.test(l));
-    const plainText = sec.title + '\n' + plainLines.join('\n');
-
     // Render section content HTML
     const contentHtml = sec.lines.map(function(l) {
       const lt = l.trim();
@@ -7899,8 +7893,50 @@ function renderCarePlan(text) {
       } else if (/^---\s+.+\s+---$/.test(lt)) {
         var divLabel = lt.replace(/^-+\s+/, '').replace(/\s+-+$/, '');
         return '<div style="font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 6px;padding:6px 10px;background:#eef2fa;border-left:3px solid var(--navy);border-radius:0 4px 4px 0">' + escHtml(divLabel) + '</div>';
-      } else if (/^SECONDARY GOAL:/i.test(lt)) {
-        var goalTxt = lt.replace(/^SECONDARY GOAL:\s*/i, '');
+      } else if (/^\*{0,2}GOAL FOCUS:\*{0,2}/i.test(lt)) {
+        var focusTxt = lt.replace(/^\*{0,2}GOAL FOCUS:\*{0,2}\s*/i, '');
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--row-alt);border-radius:6px;border-left:3px solid var(--navy)">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:90px">Focus</span>'
+          + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(focusTxt) + '</span>'
+          + makeCpBtn(focusTxt, '📋', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + '</div>';
+      } else if (/^\*{0,2}GOAL MEASUREMENT:\*{0,2}/i.test(lt)) {
+        var measTxt = lt.replace(/^\*{0,2}GOAL MEASUREMENT:\*{0,2}\s*/i, '');
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--row-alt);border-radius:6px;border-left:3px solid var(--navy)">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:90px">Measurement</span>'
+          + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(measTxt) + '</span>'
+          + makeCpBtn(measTxt, '📋', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + '</div>';
+      } else if (/^\*{0,2}GOAL DURATION:\*{0,2}/i.test(lt)) {
+        var durTxt = lt.replace(/^\*{0,2}GOAL DURATION:\*{0,2}\s*/i, '');
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--row-alt);border-radius:6px;border-left:3px solid var(--navy)">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:90px">Duration</span>'
+          + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(durTxt) + '</span>'
+          + '<span style="font-size:.7rem;color:var(--text-lt);flex-shrink:0;padding-top:2px;font-style:italic">click button</span>'
+          + '</div>';
+      } else if (/^\*{0,2}SECONDARY GOAL FOCUS:\*{0,2}/i.test(lt)) {
+        var secFocusTxt = lt.replace(/^\*{0,2}SECONDARY GOAL FOCUS:\*{0,2}\s*/i, '');
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--amber-bg,#fff8ee);border-radius:6px;border-left:3px solid var(--gold,#c9972c)">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--gold-dark,#7a4200);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:90px">Sec. Focus</span>'
+          + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(secFocusTxt) + '</span>'
+          + makeCpBtn(secFocusTxt, '📋', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + '</div>';
+      } else if (/^\*{0,2}SECONDARY GOAL MEASUREMENT:\*{0,2}/i.test(lt)) {
+        var secMeasTxt = lt.replace(/^\*{0,2}SECONDARY GOAL MEASUREMENT:\*{0,2}\s*/i, '');
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--amber-bg,#fff8ee);border-radius:6px;border-left:3px solid var(--gold,#c9972c)">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--gold-dark,#7a4200);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:90px">Sec. Measure</span>'
+          + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(secMeasTxt) + '</span>'
+          + makeCpBtn(secMeasTxt, '📋', 'margin-left:6px;padding:4px 10px;flex-shrink:0;')
+          + '</div>';
+      } else if (/^\*{0,2}SECONDARY GOAL DURATION:\*{0,2}/i.test(lt)) {
+        var secDurTxt = lt.replace(/^\*{0,2}SECONDARY GOAL DURATION:\*{0,2}\s*/i, '');
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:var(--amber-bg,#fff8ee);border-radius:6px;border-left:3px solid var(--gold,#c9972c)">'
+          + '<span style="font-size:.72rem;font-weight:700;color:var(--gold-dark,#7a4200);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:90px">Sec. Duration</span>'
+          + '<span style="font-size:.88rem;color:var(--text);flex:1">' + escHtml(secDurTxt) + '</span>'
+          + '<span style="font-size:.7rem;color:var(--text-lt);flex-shrink:0;padding-top:2px;font-style:italic">click button</span>'
+          + '</div>';
+      } else if (/^\*{0,2}SECONDARY GOAL:\*{0,2}/i.test(lt)) {
+        var goalTxt = lt.replace(/^\*{0,2}SECONDARY GOAL:\*{0,2}\s*/i, '');
         return '<div style="background:var(--amber-bg,#fff8ee);border:1px solid var(--gold,#c9972c);border-radius:6px;padding:8px 12px;margin:6px 0"><div style="font-size:.72rem;font-weight:700;color:var(--gold-dark,#7a4200);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Secondary Goal</div><div style="font-size:.88rem;color:var(--text)">' + escHtml(goalTxt) + '</div></div>';
       } else if (/^INTERVENTION\s+\d+[:\.]/.test(lt)) {
         return ''; // Strip numbered intervention group headers
@@ -7919,15 +7955,19 @@ function renderCarePlan(text) {
       }
     }).join('');
 
-    // Section block — Goal section gets a copy button in the header; others just show the title
-    const isGoal = sec.title.toUpperCase() === 'GOAL';
+    // Section block — each GOAL FOCUS/MEASUREMENT/DURATION line has its own copy button
+    // (added above); no header-level copy here since a combined dump would mix the three
+    // labeled values together, which doesn't match pasting into three separate Firenote fields.
+    const isGoalSection = sec.title.toUpperCase() === 'GOAL';
+    const goalCategoryReminder = isGoalSection
+      ? '<div style="font-size:.76rem;color:#7a4200;background:#fff8ee;border:1px solid #ffe082;border-radius:5px;padding:5px 9px;margin-bottom:8px">📌 In Firenote\'s Goal Builder, select Category: Custom to unlock the Focus/Measurement/Duration fields below.</div>'
+      : '';
     out.push(
       '<div style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--row-alt);border-bottom:1px solid var(--border)">'
       + '<span style="font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.08em">' + escHtml(sec.title) + '</span>'
-      + (isGoal ? makeCpBtn(plainLines.join(' '), '📋 Copy', 'padding:4px 12px;') : '')
       + '</div>'
-      + '<div style="padding:10px 12px">' + contentHtml + '</div>'
+      + '<div style="padding:10px 12px">' + goalCategoryReminder + contentHtml + '</div>'
       + '</div>'
     );
   });
@@ -8039,8 +8079,10 @@ function buildSituationalPrompt(flags, isPrimaryDxPlan, caregiver) {
   if (flags.oxygen) {
     lines.push(`
 FLAG — CONTINUOUS OXYGEN (generate a SEPARATE care plan for Z99.81 Dependence on supplemental oxygen):
-This patient requires continuous oxygen. Z99.81 must be added as a related problem with its own care plan:
-Goal: Patient will experience improved respiratory comfort as evidenced by patient/caregiver report and reduced signs of respiratory distress.
+This patient requires continuous oxygen. Z99.81 must be added as a related problem with its own care plan. Its goal must ALSO use the three-field format — output it prefixed exactly as shown:
+SECONDARY GOAL FOCUS: improved respiratory comfort
+SECONDARY GOAL MEASUREMENT: patient/caregiver report and reduced signs of respiratory distress
+SECONDARY GOAL DURATION: end of the current benefit period
 Interventions:
 • ASSESS: Nurse will assess respiratory status each visit including rate, depth, work of breathing, lung sounds, level of dyspnea, and use of accessory muscles.
 • ASSESS: Nurse will assess oxygen flow rate, verify it matches orders, and assess oxygen equipment for proper setup and functioning.
@@ -8074,7 +8116,10 @@ Interventions:
   if (flags.foley) {
     lines.push(`
 FLAG — FOLEY CATHETER (generate a SEPARATE care plan for Y84.6 Urinary Catheterization):
-Goal: Patient will remain comfortable with minimum catheter-related complications and maintain adequate urine flow.
+Its goal must ALSO use the three-field format — output it prefixed exactly as shown:
+SECONDARY GOAL FOCUS: comfort with minimal catheter-related complications
+SECONDARY GOAL MEASUREMENT: maintained adequate urine flow and absence of catheter complications
+SECONDARY GOAL DURATION: end of the current benefit period
 Interventions:
 • ASSESS: Nurse will assess foley catheter every visit for patency, urine color, clarity, amount, presence of sediment, and signs/symptoms of UTI such as fever, suprapubic pain, or mental changes.
 • EDUCATE: Nurse will educate patient/caregiver on proper foley bag positioning (below bladder level, never on the floor), emptying technique for drainage bag, importance of keeping tubing straight/untangled, and proper routine perineal care.
@@ -8087,7 +8132,10 @@ Interventions:
   if (flags.fallRisk) {
     lines.push(`
 SITUATIONAL — FALL RISK (add fall risk interventions under an appropriate existing diagnosis, or add R26.89 Abnormality of gait and mobility as a new problem if no applicable diagnosis exists):
-Goal: Patient will realize decreased fall risk with implementation of fall prevention measures as illustrated by reduction in fall events by the end of the current benefit period.
+If added as a new problem, its goal must ALSO use the three-field format — output it prefixed exactly as shown:
+SECONDARY GOAL FOCUS: decreased fall risk with implementation of fall prevention measures
+SECONDARY GOAL MEASUREMENT: reduction in fall events
+SECONDARY GOAL DURATION: end of the current benefit period
 Interventions:
 • ASSESS: Nurse will assess patient's risk for falls at each visit and implement appropriate safety measures.
 • EDUCATE: Nurse will educate patient and family/caregiver on the importance of using assistive devices and following safety precautions to prevent falls.
@@ -8099,7 +8147,10 @@ Interventions:
   if (flags.skinRisk) {
     lines.push(`
 SITUATIONAL — SKIN BREAKDOWN RISK (add under an appropriate existing diagnosis such as malnutrition or immobility, or add Z91.89 Other specified personal risk factors if no applicable diagnosis exists):
-Goal: Patient will remain free from skin breakdown/pressure injury as evidenced by intact skin or wound healing progress throughout the benefit period.
+If added as a new problem, its goal must ALSO use the three-field format — output it prefixed exactly as shown:
+SECONDARY GOAL FOCUS: freedom from skin breakdown/pressure injury
+SECONDARY GOAL MEASUREMENT: intact skin or wound healing progress
+SECONDARY GOAL DURATION: end of the current benefit period
 Interventions:
 • ASSESS: Nurse will assess skin integrity at each visit, including bony prominences, areas of moisture exposure, and existing wounds or areas of breakdown.
 • EDUCATE: Nurse will educate caregiver on proper turning and repositioning schedule, skin care techniques, and use of protective barriers/moisture barriers.
@@ -8127,7 +8178,7 @@ SITUATIONAL — ANTICOAGULANT THERAPY (add bleeding precaution interventions und
 FLAG — ACTIVE WOUND ON ADMISSION:
 ⚠ QAPI EVENT REQUIRED — document wound(s) present on admission in the QAPI section before closing this visit.
 ⚠ WOUND CARE ORDER REQUIRED — ensure a wound care order is entered for each wound.
-A separate wound care plan is required for each wound with at least 1 goal and 3 interventions (Assess, Educate, Perform). Use the Wound Care quick-fill scenario in the Care Plan Builder for each wound.`);
+A separate wound care plan is required for each wound with at least 1 goal and 3 interventions (Assess, Educate, Perform). Use the 🩹 Wounds button above to look up each wound's code and generate its care plan individually.`);
   }
 
   // ── Active Infection ────────────────────────────────────────────
@@ -8136,7 +8187,7 @@ A separate wound care plan is required for each wound with at least 1 goal and 3
 FLAG — ACTIVE INFECTION ON ADMISSION:
 ⚠ QAPI EVENT REQUIRED — document the infection present on admission in the QAPI section before closing this visit.
 ⚠ ANTIBIOTIC/TREATMENT ORDER — ensure any ordered treatment is entered.
-A separate infection care plan is required using the specific infection ICD-10 code (e.g. N39.0 for UTI) with at least 1 goal and 3 interventions.`);
+A separate infection care plan is required using the specific infection ICD-10 code (e.g. N39.0 for UTI) with at least 1 goal and 3 interventions. Use the 🦠 Infections button above to look up each infection's code and generate its care plan individually.`);
   }
 
   // ── Lives Alone ─────────────────────────────────────────────────
@@ -8304,8 +8355,10 @@ CRITICAL: This care plan addresses "${problem}" as a safety or crisis concern. T
 
 REQUIREMENTS:
 
-1. GOAL: Must be measurable and safety-focused. Format:
-"Patient/caregiver will [demonstrate/verbalize/maintain] [specific safety behavior or risk reduction outcome] as evidenced by [measurable indicator] throughout the benefit period."
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence, all safety-focused:
+   GOAL FOCUS: short phrase (no trailing period) naming WHAT safety behavior or risk-reduction outcome is being targeted, e.g. "demonstrated fall prevention safety practices"
+   GOAL MEASUREMENT: short phrase (no trailing period) naming the measurable indicator, e.g. "verbalized understanding of safety measures and absence of fall events"
+   GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more appropriate.
 
 2. INTERVENTIONS: Generate a minimum of one ASSESS, one INTERVENE, and one DOCUMENT intervention. You may add additional individual interventions (up to 6 total lines) if clinically appropriate. Every intervention must be a single standalone line — do NOT group them into numbered sections or categories. Do NOT use Perform or Educate labels. Use only ASSESS, INTERVENE, DOCUMENT.
    ASSESS — Nurse will assess [specific safety risk or indicator] at each visit
@@ -8317,7 +8370,9 @@ REQUIREMENTS:
 [problem statement]
 
 ## GOAL
-[safety goal]
+GOAL FOCUS: [short phrase]
+GOAL MEASUREMENT: [short phrase]
+GOAL DURATION: [exact duration value]
 
 ## INTERVENTIONS
 **ASSESS** — Nurse will assess [...]
@@ -8343,8 +8398,10 @@ CRITICAL: "${problem}" is a care coordination or planning problem — NOT a clin
 
 REQUIREMENTS:
 
-1. GOAL: Must be coordination-focused and measurable. Format:
-"Patient/family/caregiver will [achieve specific coordination outcome — e.g. verbalize understanding of, complete, successfully transition to] [specific goal] as evidenced by [measurable indicator] by [timeframe or throughout the benefit period]."
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence, all coordination-focused:
+   GOAL FOCUS: short phrase (no trailing period) naming WHAT coordination outcome is being targeted — e.g. verbalized understanding of, completion of, or successful transition to a specific plan, e.g. "successful transition to facility-based care"
+   GOAL MEASUREMENT: short phrase (no trailing period) naming the measurable indicator, e.g. "documented care plan agreement between hospice and facility staff"
+   GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more appropriate.
 
 2. INTERVENTIONS: Generate a minimum of one ASSESS, one EDUCATE, and one PERFORM intervention. You may add additional individual lines (up to 6 total) if clinically appropriate. Every intervention must be a single standalone line — do NOT group into numbered sections or categories. All must be specific to "${problem}" coordination needs:
    ASSESS — Nurse will assess [specific coordination need, readiness, or barrier]
@@ -8358,7 +8415,9 @@ REQUIREMENTS:
 [problem statement]
 
 ## GOAL
-[coordination goal]
+GOAL FOCUS: [short phrase]
+GOAL MEASUREMENT: [short phrase]
+GOAL DURATION: [exact duration value]
 
 ## INTERVENTIONS
 **ASSESS** — Nurse will assess [...]
@@ -8384,8 +8443,10 @@ CRITICAL: "${problem}" is a psychosocial or emotional care problem. The goal mus
 
 REQUIREMENTS:
 
-1. GOAL: Must be psychosocial and measurable. Format:
-"Patient/family/caregiver will [verbalize/demonstrate/utilize] [specific coping strategy, emotional outcome, or support utilization] as evidenced by [observable indicator] throughout the benefit period."
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence, all psychosocial:
+   GOAL FOCUS: short phrase (no trailing period) naming WHAT coping strategy, emotional outcome, or support utilization is being targeted, e.g. "verbalized coping strategies for anticipatory grief"
+   GOAL MEASUREMENT: short phrase (no trailing period) naming the observable indicator, e.g. "patient/family report of improved emotional adjustment and engagement with support services"
+   GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more appropriate.
 
 2. INTERVENTIONS: Generate a minimum of one ASSESS, one EDUCATE, and one PERFORM intervention. You may add additional individual lines (up to 6 total) if clinically appropriate. Every intervention must be a single standalone line — do NOT group into numbered sections or categories. All must be specific to "${problem}":
    ASSESS — Nurse will assess [specific psychosocial or emotional indicator]
@@ -8399,7 +8460,9 @@ REQUIREMENTS:
 [problem statement]
 
 ## GOAL
-[psychosocial goal]
+GOAL FOCUS: [short phrase]
+GOAL MEASUREMENT: [short phrase]
+GOAL DURATION: [exact duration value]
 
 ## INTERVENTIONS
 **ASSESS** — Nurse will assess [...]
@@ -8425,11 +8488,15 @@ CRITICAL: This care plan is for the specific problem "${problem}" — NOT for th
 
 REQUIREMENTS — STRICTLY FOLLOW THESE:
 
-1. GOAL: ${isPrimaryDxPlan
-  ? `This is the PRIMARY hospice diagnosis — the goal must be BROAD and hospice-focused, not specific to a single symptom. Use this EXACT format:
-"Patient will experience optimal comfort, dignity, and quality of life consistent with hospice goals of care, with symptoms (including pain, dyspnea, anxiety, and any other distressing symptoms) managed to the greatest extent possible, as evidenced by patient/caregiver report of comfort and absence of unnecessary suffering throughout the benefit period."`
-  : `Must be comfort-focused and specific to "${problem}". Use this EXACT format:
-"Patient will remain comfortable and free from [problem]-related distress, as measured by patient report (if able), observed [relevant clinical indicators specific to ${problem}], and trends in caregiver feedback by the end of the current benefit period."`}
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence, not a full sentence for each: ${isPrimaryDxPlan
+  ? `This is the PRIMARY hospice diagnosis — the goal must be BROAD and hospice-focused, not specific to a single symptom.
+   GOAL FOCUS: short phrase (no trailing period), e.g. "optimal comfort, dignity, and quality of life consistent with hospice goals of care, with symptoms (including pain, dyspnea, anxiety, and any other distressing symptoms) managed to the greatest extent possible"
+   GOAL MEASUREMENT: short phrase (no trailing period), e.g. "patient/caregiver report of comfort and absence of unnecessary suffering"
+   GOAL DURATION: "end of the current benefit period" unless a shorter window is clearly more appropriate.`
+  : `Must be comfort-focused and specific to "${problem}".
+   GOAL FOCUS: short phrase (no trailing period) naming WHAT the goal is about, e.g. "comfort and freedom from ${problem}-related distress" — adapt to the specific problem.
+   GOAL MEASUREMENT: short phrase (no trailing period) naming HOW progress is measured, e.g. "patient report (if able), observed [clinical indicators specific to ${problem}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
+   GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more clinically appropriate for this specific problem.`}
 
 2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${problem}":
    ASSESS — Nurse will assess [specific symptom or indicator related to ${problem}] at each visit
@@ -8446,7 +8513,9 @@ ${requiredPrimaryBlock}
 [problem statement]
 
 ## GOAL
-[goal statement]
+GOAL FOCUS: [short phrase]
+GOAL MEASUREMENT: [short phrase]
+GOAL DURATION: [exact duration value]
 
 ## INTERVENTIONS
 **ASSESS** — Nurse will assess [...]
@@ -8500,6 +8569,14 @@ function clearCarePlan() {
   if (caregiverField) caregiverField.style.display = 'none';
   const sitHint = document.getElementById('cp-situational-hint');
   if (sitHint) sitHint.style.display = 'none';
+  // Close and reset the Wounds/Infections builders so stale entries don't linger after a clear
+  ['wound', 'infection'].forEach(function(kind) {
+    var sectionEl = document.getElementById('cp-' + kind + '-section');
+    var mountEl = document.getElementById('cp-' + kind + '-mount');
+    if (sectionEl) sectionEl.style.display = 'none';
+    if (mountEl) mountEl.innerHTML = '';
+    if (typeof _cpWoundInfectionMounted !== 'undefined') _cpWoundInfectionMounted[kind] = false;
+  });
 }
 
 const CP_PRESETS = {
@@ -8551,7 +8628,7 @@ function cpQuickFillSituational(key) {
     foley: { problem: 'Y84.6 Urinary catheterization (Foley catheter) — care and management', type: 'clinical', goals: 'comfort', hint: 'Add Y84.6 as a separate active problem. Ensure catheter order and supplies are entered.' },
     fallrisk: { problem: 'Fall risk — safety assessment and prevention', type: 'safety', goals: 'safety_general', hint: 'Add under an applicable diagnosis or add R26.89 (Abnormality of gait and mobility) as a new problem.' },
     skinrisk: { problem: 'Risk for skin breakdown — prevention and monitoring', type: 'clinical', goals: 'safety', hint: 'Add under an applicable diagnosis or add Z91.89 (Other specified personal risk factors) as a new problem.' },
-    wound: { problem: 'Wound care — assessment, treatment, and healing support', type: 'clinical', goals: 'comfort', hint: 'Add as a separate problem per wound. Ensure wound care order and supplies are entered. QAPI event required if wound present on admission.' },
+    // 'wound' preset removed — the Wounds button now opens the interactive multi-entry builder instead.
     discharge: { problem: 'Z71.89 – Encounter for other specified counseling (Discharge Planning / Live Discharge)', type: 'coordination', goals: 'transition', hint: 'Use when patient is anticipated to discharge from hospice services, or when a patient no longer qualifies (NLQ/voluntary withdrawal). Generates instantly using approved QA language.', hardcoded: true },
     respite: { problem: 'Respite admission — caregiver relief and patient safety during temporary placement', type: 'coordination', goals: 'respite', hint: 'Use when patient is being admitted for a short-term respite level of care.' },
     gip: { problem: 'GIP admission — acute symptom management in inpatient setting', type: 'coordination', goals: 'transition', hint: 'General Inpatient (GIP) level of care — for acute symptom management that cannot be managed in the home setting.' },
@@ -9451,8 +9528,10 @@ CRITICAL: This care plan is for the specific problem "${problemText}" — NOT fo
 
 REQUIREMENTS — STRICTLY FOLLOW THESE:
 
-1. GOAL: Must be comfort-focused and specific to "${problemText}". Use this EXACT format, filling in clinical indicators relevant to "${problemText}":
-"Patient will remain comfortable and free from [problem]-related distress, as measured by patient report (if able), observed [relevant clinical indicators specific to ${problemText}], and trends in caregiver feedback by the end of the current benefit period."
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence. Generate each specific to "${problemText}":
+   - goalFocus: A short phrase (not a full sentence, no trailing period) naming WHAT the goal is about. Format example: "comfort and freedom from ${problemText}-related distress" — adapt the wording to the specific problem.
+   - goalMeasurement: A short phrase (not a full sentence, no trailing period) naming HOW progress will be measured — the observable/reportable indicators. Format example: "patient report (if able), observed [clinical indicators specific to ${problemText}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
+   - goalDuration: Must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more clinically appropriate for this specific problem.
 
 2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${problemText}" and follow this exact structure:
 
@@ -9467,7 +9546,7 @@ REQUIREMENTS — STRICTLY FOLLOW THESE:
 4. PHYSICIAN/IDT COORDINATION: Include one sentence describing what to flag at IDT or discuss with the physician regarding this problem.
 
 Respond ONLY with valid JSON, no markdown, no extra text:
-{"goal":"...","interventions":["ASSESS: Nurse will...","EDUCATE: Nurse will...","PERFORM: Nurse will..."],"physicianCoordination":"..."}`;
+{"goalFocus":"...","goalMeasurement":"...","goalDuration":"end of the current benefit period","interventions":["ASSESS: Nurse will...","EDUCATE: Nurse will...","PERFORM: Nurse will..."],"physicianCoordination":"..."}`;
 
   let result = null;
   try {
@@ -9488,6 +9567,325 @@ Respond ONLY with valid JSON, no markdown, no extra text:
 
 // Wires a "Generate Care Plan" click: shows a loading state in outputContainer, calls the AI,
 // then renders the result inline using the same renderer Build All Tier 1 already uses.
+// Shared, parameterized wound/infection entry builder — mounts a full interactive builder
+// (multiple entries, AI-assisted code suggestion, live duplicate-code detection, inline
+// Generate Care Plan per entry) into any container. Used by the standalone Care Plan
+// Builder's Wounds & Infections section. Kept separate from the Tiering tool's own
+// buildSituationalCards implementation so neither can regress the other.
+// Shows/hides the Wounds or Infections section in the standalone Care Plan Builder, mounting
+// the interactive builder the first time it's opened (not rebuilt on every toggle, so entries
+// already in progress aren't lost by accidentally closing and reopening).
+var _cpWoundInfectionMounted = { wound: false, infection: false };
+function toggleWoundInfectionSection(kind) {
+  var sectionEl = document.getElementById('cp-' + kind + '-section');
+  var mountEl = document.getElementById('cp-' + kind + '-mount');
+  if (!sectionEl || !mountEl) return;
+
+  var isOpen = sectionEl.style.display !== 'none';
+  if (isOpen) {
+    sectionEl.style.display = 'none';
+    return;
+  }
+
+  sectionEl.style.display = 'block';
+  if (!_cpWoundInfectionMounted[kind]) {
+    mountWoundInfectionBuilder(kind, mountEl,
+      function() { return document.getElementById('cp-primary-dx') ? document.getElementById('cp-primary-dx').value.trim() : ''; },
+      function() { return document.getElementById('cp-details') ? document.getElementById('cp-details').value.trim() : ''; }
+    );
+    _cpWoundInfectionMounted[kind] = true;
+  }
+  sectionEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function mountWoundInfectionBuilder(kind, container, getPrimaryDx, getDetails) {
+  var isWound = kind === 'wound';
+  var cfg = isWound ? {
+    icon: '🩹', label: 'wound', labelCap: 'Wound', plural: 'wounds',
+    descPlaceholder: 'e.g. Right lower leg, wound #1 — venous stasis ulcer',
+    codePlaceholder: 'e.g. L97.219',
+    dupNote: '<strong>⚠ Each wound needs its own distinct ICD-10 code.</strong> Firenote will not allow the same code to be active twice at the same time — if two wounds share the same type and location (e.g. two ulcers on the same lower leg), they must be differentiated by stage, laterality, or sub-site so each gets a unique code.',
+  } : {
+    icon: '🦠', label: 'infection', labelCap: 'Infection', plural: 'infections',
+    descPlaceholder: 'e.g. UTI with E. coli — or — Cellulitis, right lower leg',
+    codePlaceholder: 'e.g. N39.0',
+    dupNote: '<strong>⚠ Each infection needs its own distinct ICD-10 code.</strong> If the patient has more than one infection present (e.g. a UTI and cellulitis), each must be coded and care-planned separately — Firenote will not allow the same code to be active twice at the same time.',
+  };
+
+  container.innerHTML = '';
+
+  var dupNoteEl = document.createElement('div');
+  dupNoteEl.style.cssText = 'font-size:.78rem;color:#7a2020;background:#fdf2f1;border:1px solid #e8b4b0;padding:8px 11px;border-radius:5px;margin-bottom:10px;line-height:1.5';
+  dupNoteEl.innerHTML = cfg.dupNote;
+  container.appendChild(dupNoteEl);
+
+  var liveDupWarning = document.createElement('div');
+  liveDupWarning.style.cssText = 'display:none;font-size:.8rem;color:#fff;background:#c0392b;padding:8px 11px;border-radius:5px;margin-bottom:10px;line-height:1.5;font-weight:600';
+  container.appendChild(liveDupWarning);
+
+  var entriesWrap = document.createElement('div');
+  container.appendChild(entriesWrap);
+
+  function checkDuplicateCodes() {
+    var codeInputs = Array.prototype.slice.call(entriesWrap.querySelectorAll('.wi-code-input'));
+    var seen = {};
+    var dupes = [];
+    codeInputs.forEach(function(inp) {
+      var v = inp.value.trim().toUpperCase();
+      inp.style.borderColor = 'var(--border)';
+      if (!v) return;
+      if (seen[v]) { if (dupes.indexOf(v) === -1) dupes.push(v); }
+      seen[v] = seen[v] || [];
+      seen[v].push(inp);
+    });
+    if (dupes.length > 0) {
+      dupes.forEach(function(code) { (seen[code] || []).forEach(function(inp) { inp.style.borderColor = '#c0392b'; }); });
+      liveDupWarning.style.display = 'block';
+      liveDupWarning.innerHTML = '⚠ Duplicate code entered: ' + dupes.map(function(c) { return escapeHtml(c); }).join(', ') + ' — two ' + cfg.plural + ' below share this code. Firenote will reject this; give one a more specific code.';
+    } else {
+      liveDupWarning.style.display = 'none';
+    }
+  }
+
+  async function suggestCode(descInput, codeInput, suggestBtn, suggestionsWrap, encounterVal) {
+    var desc = descInput.value.trim();
+    if (!desc) { alert('Enter a ' + cfg.label + ' description first, then request a code suggestion.'); return; }
+    var origLabel = suggestBtn.textContent;
+    suggestBtn.disabled = true;
+    suggestBtn.textContent = '⏳ Looking up...';
+    suggestionsWrap.innerHTML = '';
+    suggestionsWrap.style.display = 'none';
+
+    var encounterGuidance = '';
+    if (isWound && encounterVal && encounterVal !== 'na') {
+      var encounterMap = { initial: 'A (initial encounter — active treatment)', subsequent: 'D (subsequent encounter — routine aftercare during healing)', sequela: 'S (sequela — late effect of a prior, now-healed injury)' };
+      encounterGuidance = '\n\n7TH CHARACTER — ENCOUNTER TYPE: The nurse has indicated this is a ' + encounterMap[encounterVal] + '. ONLY apply this as the 7th character if the resulting code is from a category that actually uses the A/D/S encounter extension (chapter 19 injury/external-cause codes, S00-T88 range — e.g. open wounds, surgical wound dehiscence/complications T81.3x/T81.4x, burns). If the most accurate code is a chronic ulcer code (pressure ulcer L89.xxx, or non-pressure chronic ulcer L97.xxx/L98.4xx), do NOT add a 7th character — those categories are staged by severity/stage digit instead and have no encounter extension at all; ignore the encounter type entirely for those. If a 7th-character code needs padding to reach 7 characters, use "X" as a placeholder for any skipped position before the encounter letter.';
+    } else if (isWound) {
+      encounterGuidance = '\n\n7TH CHARACTER — ENCOUNTER TYPE: No encounter type was specified (defaults to chronic ulcer). Do NOT add a 7th character (A/D/S) to pressure ulcer (L89.xxx) or non-pressure chronic ulcer (L97.xxx/L98.4xx) codes — those categories have no encounter extension. Only traumatic/surgical wound codes (S00-T88 range) use A/D/S, and none was indicated here.';
+    }
+
+    var prompt = isWound
+      ? 'You are a hospice and wound care ICD-10-CM coding expert. Given the wound description below, return the 2-4 MOST LIKELY specific ICD-10-CM codes.\n\nCRITICAL — verified site-to-code-family mappings. Do NOT deviate from these; matching a plausible-looking code to the wrong site is a serious error:\n\nPRESSURE ULCER (L89) by site: elbow=L89.0xx, back(non-sacral)=L89.1xx, sacrum specifically=L89.15x, hip=L89.2xx, buttock=L89.3xx, contiguous back/buttock/hip=L89.4xx, ankle=L89.5xx, heel=L89.6xx, other site=L89.8xx, unspecified site=L89.9xx. Stage/severity is the next digit (1=stage 1, 2=stage 2, 3=stage 3, 4=stage 4, 6=unstageable, 0=deep tissue damage).\n\nNON-PRESSURE CHRONIC ULCER, non-lower-limb (L98.4) by site: buttock=L98.41x, back=L98.42x, abdomen=L98.43x, chest=L98.44x, neck=L98.45x, face=L98.46x, groin=L98.47x, other sites=L98.49x. Severity is the next digit (1=limited to skin breakdown, 2=fat layer exposed, 3=muscle necrosis, 4=bone necrosis, 9=unspecified severity).\n\nNON-PRESSURE CHRONIC ULCER, lower limb (L97) by site: thigh=L97.1xx, calf=L97.2xx, ankle=L97.3xx, heel and midfoot=L97.4xx, other part of foot=L97.5xx, other part of lower leg=L97.8xx, unspecified part of lower leg=L97.9xx.\n\nOther ulcer types: venous stasis ulcer of leg uses L97.xxx (site-specific per above) — venous etiology is documented via an additional code (I83.xxx) when known, not a different primary code family. Arterial/ischemic ulcer = I70.xxx or I96. Diabetic foot ulcer = E11.62x (diabetes with skin complication) sequenced with the L97.xxx site code.\n\nDouble-check that the digit(s) after the decimal point in your suggested code actually correspond to the site named in the description above before responding — a wrong site digit produces a code for a completely different body part. Correct laterality (right/left) and anatomical sub-site when documented. Never fabricate a code. If the description is ambiguous, still give your best 2-4 ranked candidates from most to least likely — do not refuse.' + encounterGuidance + '\n\nWound description: "' + desc + '"\n\nRespond ONLY with valid JSON, no markdown, no extra text:\n{"options":[{"code":"L89.153","label":"Pressure ulcer of sacral region, stage 3"},{"code":"L89.154","label":"Pressure ulcer of sacral region, stage 4"}]}'
+      : 'You are a hospice clinical coding expert specializing in infectious disease ICD-10-CM. Given the infection description below, return the 2-4 MOST LIKELY specific ICD-10-CM codes. Favor precise, site-specific codes (e.g. N39.0 for UTI, L03.xxx for cellulitis by site, J18.9 for pneumonia unspecified organism, J15.x when organism is documented) over vague unspecified codes when the description supports it. Never fabricate a code. If ambiguous, still give your best 2-4 ranked candidates from most to least likely — do not refuse.\n\nInfection description: "' + desc + '"\n\nRespond ONLY with valid JSON, no markdown, no extra text:\n{"options":[{"code":"N39.0","label":"Urinary tract infection, site not specified"},{"code":"N30.00","label":"Acute cystitis without hematuria"}]}';
+
+    try {
+      var resp = await fetch('/.netlify/functions/claude', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt, max_tokens: 800 }) });
+      var data = await resp.json();
+      var rawText = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
+      var clean = rawText.replace(/```json|```/g, '').trim();
+      var parsed = JSON.parse(clean);
+      var opts = Array.isArray(parsed.options) ? parsed.options.filter(function(o) { return o && o.code; }) : [];
+
+      suggestionsWrap.style.display = 'block';
+      if (opts.length === 0) {
+        suggestionsWrap.innerHTML = '<div style="font-size:.8rem;color:var(--text-lt);font-style:italic;padding:4px 0">No confident suggestions — use the ICD-10 Reference instead.</div>';
+      } else {
+        var pickLabel = document.createElement('div');
+        pickLabel.style.cssText = 'font-size:.76rem;color:var(--text-mid);font-style:italic;margin-bottom:4px';
+        pickLabel.textContent = 'Select the most accurate option for this ' + cfg.label + ':';
+        suggestionsWrap.appendChild(pickLabel);
+        opts.forEach(function(opt) {
+          var optRow = document.createElement('label');
+          optRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:3px;cursor:pointer;font-size:.84rem;padding:5px 8px;border-radius:4px';
+          optRow.addEventListener('mouseover', function() { optRow.style.background = 'var(--row-alt)'; });
+          optRow.addEventListener('mouseout', function() { optRow.style.background = ''; });
+          optRow.innerHTML = '<span style="font-family:monospace;font-size:.78rem;background:var(--row-alt);border:1px solid var(--border);padding:1px 6px;border-radius:3px;flex-shrink:0">' + escapeHtml(opt.code) + '</span><span>' + escapeHtml(opt.label || '') + '</span>';
+          optRow.addEventListener('click', function() {
+            codeInput.value = (opt.code || '').toUpperCase();
+            checkDuplicateCodes();
+          });
+          suggestionsWrap.appendChild(optRow);
+        });
+      }
+    } catch (e) {
+      suggestionsWrap.style.display = 'block';
+      suggestionsWrap.innerHTML = '<div style="font-size:.8rem;color:var(--red)">Could not get suggestions — use the ICD-10 Reference instead.</div>';
+    }
+    suggestBtn.disabled = false;
+    suggestBtn.textContent = origLabel;
+  }
+
+  function buildEntryRow() {
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:10px 11px;background:#fff;border:1px solid #ffe082;border-radius:6px;margin-bottom:8px';
+
+    var descLabel = document.createElement('div');
+    descLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
+    descLabel.textContent = cfg.labelCap + ' description' + (isWound ? ' / location' : ' / site');
+    var descInput = document.createElement('input');
+    descInput.type = 'text';
+    descInput.placeholder = cfg.descPlaceholder;
+    descInput.style.cssText = 'width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.85rem;margin-bottom:8px;box-sizing:border-box';
+
+    var encounterWrap = null;
+    var encounterSelect = null;
+    if (isWound) {
+      // The 7th-character encounter extension (A/D/S) only applies to traumatic/surgical wound
+      // codes (S00-T88 range) — NOT to pressure ulcers (L89) or non-pressure chronic ulcers
+      // (L97/L98.4), which use a severity/stage digit instead and have no 7th character at all.
+      // Most hospice wounds are chronic ulcers, so default to N/A rather than forcing a choice
+      // that doesn't apply to most entries.
+      encounterWrap = document.createElement('div');
+      var encounterLabel = document.createElement('div');
+      encounterLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
+      encounterLabel.textContent = 'Encounter type (only applies to traumatic/surgical wounds — not pressure or chronic ulcers)';
+      encounterSelect = document.createElement('select');
+      encounterSelect.style.cssText = 'width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.85rem;margin-bottom:8px;box-sizing:border-box;background:#fff';
+      [
+        ['na', 'N/A — pressure ulcer, venous/arterial/diabetic ulcer, or other chronic ulcer (most hospice wounds)'],
+        ['initial', 'Initial encounter — active treatment (new or worsening wound, surgical repair)'],
+        ['subsequent', 'Subsequent encounter — routine aftercare during healing'],
+        ['sequela', 'Sequela — late effect/complication of a prior, now-healed injury'],
+      ].forEach(function(opt) {
+        var o = document.createElement('option');
+        o.value = opt[0];
+        o.textContent = opt[1];
+        encounterSelect.appendChild(o);
+      });
+      encounterWrap.appendChild(encounterLabel);
+      encounterWrap.appendChild(encounterSelect);
+    }
+
+    var codeRow = document.createElement('div');
+    codeRow.style.cssText = 'display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px';
+    var codeWrap = document.createElement('div');
+    var codeLabel = document.createElement('div');
+    codeLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
+    codeLabel.textContent = 'ICD-10 code for this ' + cfg.label;
+    var codeInput = document.createElement('input');
+    codeInput.type = 'text';
+    codeInput.className = 'wi-code-input';
+    codeInput.placeholder = cfg.codePlaceholder;
+    codeInput.style.cssText = 'width:130px;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:.85rem;text-transform:uppercase';
+    codeInput.addEventListener('input', function() { codeInput.value = codeInput.value.toUpperCase(); checkDuplicateCodes(); });
+    codeWrap.appendChild(codeLabel);
+    codeWrap.appendChild(codeInput);
+
+    var suggestionsWrap = document.createElement('div');
+    suggestionsWrap.style.cssText = 'display:none;margin-top:6px;padding:8px 10px;background:var(--row-alt);border-radius:5px';
+
+    var suggestBtn = document.createElement('button');
+    suggestBtn.type = 'button';
+    suggestBtn.textContent = '🔍 Suggest Code';
+    suggestBtn.style.cssText = 'padding:6px 11px;background:#1a6a9a;color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap';
+    suggestBtn.addEventListener('click', function() { suggestCode(descInput, codeInput, suggestBtn, suggestionsWrap, encounterSelect ? encounterSelect.value : null); });
+
+    var refBtn = document.createElement('button');
+    refBtn.type = 'button';
+    refBtn.textContent = '📖 Browse Reference';
+    refBtn.style.cssText = 'padding:6px 11px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap';
+    refBtn.addEventListener('click', function() { switchToIcdRefFromCheckers(document.getElementById('checker-tab-icdref')); });
+
+    codeRow.appendChild(codeWrap);
+    codeRow.appendChild(suggestBtn);
+    codeRow.appendChild(refBtn);
+
+    var actionRow = document.createElement('div');
+    actionRow.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px';
+
+    var genBtn = document.createElement('button');
+    genBtn.type = 'button';
+    genBtn.textContent = '📋 Generate Care Plan for This ' + cfg.labelCap;
+    genBtn.style.cssText = 'padding:7px 13px;background:var(--navy);color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer';
+    var entryOutput = document.createElement('div');
+    entryOutput.style.cssText = 'display:none;margin-top:10px;padding-top:10px;border-top:1px solid #ffe082';
+    genBtn.addEventListener('click', function() {
+      var desc = descInput.value.trim();
+      var code = codeInput.value.trim();
+      if (!code) { alert('Enter the ICD-10 code for this ' + cfg.label + ' first — use Suggest Code or Browse Reference above if you need to look it up.'); return; }
+      if (!desc) { alert('Enter a description of this ' + cfg.label + ' first.'); return; }
+      generateAndRenderInlineCarePlan(code + ' ' + desc, getPrimaryDx(), getDetails(), entryOutput, genBtn);
+    });
+
+    var removeRowBtn = document.createElement('button');
+    removeRowBtn.type = 'button';
+    removeRowBtn.textContent = '🗑 Remove';
+    removeRowBtn.style.cssText = 'padding:6px 11px;background:none;color:#c0392b;border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer';
+    removeRowBtn.addEventListener('click', function() { row.remove(); checkDuplicateCodes(); });
+
+    actionRow.appendChild(genBtn);
+    actionRow.appendChild(removeRowBtn);
+
+    row.appendChild(descLabel);
+    row.appendChild(descInput);
+    if (encounterWrap) { row.appendChild(encounterWrap); }
+    row.appendChild(codeRow);
+    row.appendChild(suggestionsWrap);
+    row.appendChild(actionRow);
+    row.appendChild(entryOutput);
+    entriesWrap.appendChild(row);
+  }
+
+  buildEntryRow(); // start with one entry
+
+  var addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.textContent = '+ Add Another ' + cfg.labelCap;
+  addBtn.style.cssText = 'padding:6px 13px;background:var(--row-alt);color:var(--navy);border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;margin-bottom:12px';
+  addBtn.addEventListener('click', buildEntryRow);
+  container.appendChild(addBtn);
+
+  if (isWound) {
+    // Wound care order format reference — this is the ORDER entered in Firenote, separate
+    // from the care plan interventions generated above.
+    var orderFormatWrap = document.createElement('div');
+    orderFormatWrap.style.cssText = 'padding:10px 12px;background:#f5f7fc;border:1px solid var(--border);border-radius:6px';
+    var orderFormatTitle = document.createElement('div');
+    orderFormatTitle.style.cssText = 'font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:6px';
+    orderFormatTitle.textContent = '📝 Wound Care Order Format — enter this structure in the Firenote wound care order';
+    orderFormatWrap.appendChild(orderFormatTitle);
+
+    var woundOrderTemplates = [
+      { label: 'Daily + PRN', text: 'Remove old dressing, cleanse with [cleanser], pat dry, apply [product] to wound bed, cover with [dressing type], secure with [securement]. To be changed daily and PRN. Hospice to do on visit days, facility staff to do on non-visit days and PRN for soiled/dislodged dressing.' },
+      { label: 'Twice Weekly', text: 'Remove old dressing, cleanse with [cleanser], pat dry, apply [product] to wound bed, cover with [dressing type], secure with [securement]. To be changed twice weekly by hospice nurse and PRN by family.' }
+    ];
+    woundOrderTemplates.forEach(function(tpl) {
+      var tRow = document.createElement('div');
+      tRow.style.cssText = 'display:flex;align-items:flex-start;gap:8px;background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:5px;margin-bottom:6px';
+      var tLabel = document.createElement('div');
+      tLabel.style.cssText = 'font-size:.7rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.03em;flex-shrink:0;padding-top:2px;min-width:82px';
+      tLabel.textContent = tpl.label;
+      var tText = document.createElement('span');
+      tText.style.cssText = 'flex:1;font-size:.83rem;line-height:1.5';
+      tText.textContent = tpl.text;
+      var tCopyBtn = document.createElement('button');
+      tCopyBtn.type = 'button';
+      tCopyBtn.textContent = '📋';
+      tCopyBtn.style.cssText = 'flex-shrink:0;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;cursor:pointer';
+      tCopyBtn.addEventListener('click', function() { copyAllCpText(tCopyBtn, tpl.text); });
+      tRow.appendChild(tLabel);
+      tRow.appendChild(tText);
+      tRow.appendChild(tCopyBtn);
+      orderFormatWrap.appendChild(tRow);
+    });
+
+    var fillNote = document.createElement('div');
+    fillNote.style.cssText = 'font-size:.75rem;color:var(--text-lt);font-style:italic;margin-top:2px';
+    fillNote.textContent = 'Replace the bracketed placeholders with the actual cleanser, wound bed product, dressing type, and securement used for this wound.';
+    orderFormatWrap.appendChild(fillNote);
+
+    container.appendChild(orderFormatWrap);
+  } else {
+    // Treatment order documentation checklist — infections vary far more widely than wound
+    // dressing changes, so this is a completeness checklist rather than one fixed sentence.
+    var treatOrderWrap = document.createElement('div');
+    treatOrderWrap.style.cssText = 'padding:10px 12px;background:#f5f7fc;border:1px solid var(--border);border-radius:6px';
+    var treatOrderTitle = document.createElement('div');
+    treatOrderTitle.style.cssText = 'font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:6px';
+    treatOrderTitle.textContent = '📝 Treatment Order — confirm this is entered in Firenote for each infection';
+    treatOrderWrap.appendChild(treatOrderTitle);
+    var treatOrderList = document.createElement('ul');
+    treatOrderList.style.cssText = 'margin:0 0 4px 18px;padding:0;font-size:.83rem;line-height:1.7;color:var(--text)';
+    ['Medication name and route (oral / topical / IV / IM)', 'Dose and frequency', 'Duration of treatment (or "until reassessed")', 'Who administers on visit vs. non-visit days (hospice / facility / family), if applicable', 'Whether this is treatment of an active infection vs. prophylaxis'].forEach(function(item) {
+      var li = document.createElement('li');
+      li.textContent = item;
+      treatOrderList.appendChild(li);
+    });
+    treatOrderWrap.appendChild(treatOrderList);
+    container.appendChild(treatOrderWrap);
+  }
+}
+
 async function generateAndRenderInlineCarePlan(problemText, primaryDx, patientDetails, outputContainer, triggerBtn) {
   var origLabel = triggerBtn ? triggerBtn.textContent : null;
   if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = '⏳ Generating...'; }
@@ -10993,7 +11391,9 @@ async function buildAllTier1CarePlans(data, primaryDx, container, flags) {
   // If patient is imminent, replace primary card with hardcoded imminence care plan
   if (isImminent) {
     const isFacility = flags.setting === 'facility' || flags.setting === 'snf';
-    const immGoal = 'Patient will experience a comfortable, peaceful death as evidenced by absence of distressing symptoms and family/caregiver report of comfort and satisfaction with care throughout the final days of life.';
+    const immGoalFocus = 'comfortable, peaceful death';
+    const immGoalMeasurement = 'absence of distressing symptoms and family/caregiver report of comfort and satisfaction with care';
+    const immGoalDuration = '3 days';
     const immInterventions = [
       'ASSESS -- Nurse will assess patient physical condition and symptom burden at each visit, including pain, dyspnea, anxiety, restlessness, secretions, and changes in level of consciousness.',
       'ASSESS -- Nurse will evaluate family/caregiver coping, emotional adjustment, and readiness at each visit.',
@@ -11004,7 +11404,9 @@ async function buildAllTier1CarePlans(data, primaryDx, container, flags) {
     ].concat(isFacility ? ['PERFORM -- Nurse will coordinate with facility staff to ensure routine comfort assessments are completed and communicated to the hospice team for appropriate palliative intervention.'] : []);
 
     const immResult = {
-      goal: immGoal,
+      goalFocus: immGoalFocus,
+      goalMeasurement: immGoalMeasurement,
+      goalDuration: immGoalDuration,
       interventions: immInterventions,
       physicianCoordination: 'Notify physician of patient imminence, current symptom burden, and any medication adjustments needed to maintain comfort during the final hours of life.',
       _requiredGroups: [
@@ -11097,11 +11499,15 @@ CRITICAL: This care plan is for the specific problem "${it.diagnosis}" — NOT f
 
 REQUIREMENTS — STRICTLY FOLLOW THESE:
 
-1. GOAL: ${isPrimary
-  ? `This is the PRIMARY hospice diagnosis — the goal must be BROAD and hospice-focused, not specific to a single symptom. Use this EXACT format:
-"Patient will experience optimal comfort, dignity, and quality of life consistent with hospice goals of care, with symptoms (including pain, dyspnea, anxiety, and any other distressing symptoms) managed to the greatest extent possible, as evidenced by patient/caregiver report of comfort and absence of unnecessary suffering throughout the benefit period."`
-  : `Must be comfort-focused and specific to "${it.diagnosis}". Use this EXACT format, filling in clinical indicators relevant to "${it.diagnosis}":
-"Patient will remain comfortable and free from [problem]-related distress, as measured by patient report (if able), observed [relevant clinical indicators specific to ${it.diagnosis}], and trends in caregiver feedback by the end of the current benefit period."`}
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence: goalFocus, goalMeasurement, and goalDuration. ${isPrimary
+  ? `This is the PRIMARY hospice diagnosis — the goal must be BROAD and hospice-focused, not specific to a single symptom.
+   - goalFocus: short phrase (no trailing period), e.g. "optimal comfort, dignity, and quality of life consistent with hospice goals of care, with symptoms (including pain, dyspnea, anxiety, and any other distressing symptoms) managed to the greatest extent possible"
+   - goalMeasurement: short phrase (no trailing period), e.g. "patient/caregiver report of comfort and absence of unnecessary suffering"
+   - goalDuration: "end of the current benefit period" unless a shorter window is clearly more appropriate.`
+  : `Specific to "${it.diagnosis}".
+   - goalFocus: short phrase (no trailing period) naming WHAT the goal is about, e.g. "comfort and freedom from ${it.diagnosis}-related distress" — adapt to the specific problem.
+   - goalMeasurement: short phrase (no trailing period) naming HOW progress is measured, e.g. "patient report (if able), observed [clinical indicators specific to ${it.diagnosis}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
+   - goalDuration: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more clinically appropriate for this specific problem.`}
 
 2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${it.diagnosis}" and follow this exact structure:
 
@@ -11117,7 +11523,7 @@ REQUIREMENTS — STRICTLY FOLLOW THESE:
 4. PHYSICIAN/IDT COORDINATION: Include one sentence describing what to flag at IDT or discuss with the physician regarding this problem.
 
 Respond ONLY with valid JSON, no markdown, no extra text:
-{"goal":"...","interventions":["ASSESS: Nurse will...","EDUCATE: Nurse will...","PERFORM: Nurse will..."],"physicianCoordination":"..."}`;
+{"goalFocus":"...","goalMeasurement":"...","goalDuration":"end of the current benefit period","interventions":["ASSESS: Nurse will...","EDUCATE: Nurse will...","PERFORM: Nurse will..."],"physicianCoordination":"..."}`;
 
         let result = null;
     try {
@@ -11401,447 +11807,38 @@ function buildSituationalCards(flags, primaryDx, data) {
     ]));
   }
 
-  // ── Active Wound ─────────────────────────────────────────────────
+  // ── Active Wound / Active Infection ────────────────────────────────
+  // Both use the shared mountWoundInfectionBuilder (also used by the standalone Care Plan
+  // Builder's Wounds & Infections section) so both places always stay in sync — including the
+  // wound encounter-type (Initial/Subsequent/Sequela) handling for traumatic/surgical wounds.
   if (flags.wound) {
     var woundCard = makeCard('🩹 Active Wound on Admission', 'QAPI Required + Wound Order', red, [
       { type: 'flag', label: 'QAPI Event Required', text: 'Document wound(s) present on admission in the QAPI section before closing this visit.' }
     ]);
     var woundBody = woundCard.querySelector('.sit-card-body');
-
     if (woundBody) {
-      // Duplicate-code warning — Firenote can't hold the same active problem code twice at once,
-      // so two wounds of the same type/location must be differentiated (stage, laterality,
-      // sub-site) so each gets a genuinely distinct code.
-      var woundDupNote = document.createElement('div');
-      woundDupNote.style.cssText = 'font-size:.78rem;color:#7a2020;background:#fdf2f1;border:1px solid #e8b4b0;padding:8px 11px;border-radius:5px;margin-bottom:10px;line-height:1.5';
-      woundDupNote.innerHTML = '<strong>⚠ Each wound needs its own distinct ICD-10 code.</strong> Firenote will not allow the same code to be active twice at the same time — if two wounds share the same type and location (e.g. two ulcers on the same lower leg), they must be differentiated by stage, laterality, or sub-site so each gets a unique code.';
-      woundBody.appendChild(woundDupNote);
-
-      // Live warning — fires the moment two wound entries on THIS card end up with the same
-      // code, independent of the static note above (which is just general guidance shown
-      // regardless of what's actually been entered).
-      var woundLiveDupWarning = document.createElement('div');
-      woundLiveDupWarning.style.cssText = 'display:none;font-size:.8rem;color:#fff;background:#c0392b;padding:8px 11px;border-radius:5px;margin-bottom:10px;line-height:1.5;font-weight:600';
-      woundBody.appendChild(woundLiveDupWarning);
-
-      var woundEntriesWrap = document.createElement('div');
-      woundBody.appendChild(woundEntriesWrap);
-
-      function checkWoundDuplicateCodes() {
-        var codeInputs = Array.prototype.slice.call(woundEntriesWrap.querySelectorAll('.wound-code-input'));
-        var seen = {};
-        var dupes = [];
-        codeInputs.forEach(function(inp) {
-          var v = inp.value.trim().toUpperCase();
-          inp.style.borderColor = 'var(--border)';
-          if (!v) return;
-          if (seen[v]) { if (dupes.indexOf(v) === -1) dupes.push(v); }
-          seen[v] = seen[v] || [];
-          seen[v].push(inp);
-        });
-        if (dupes.length > 0) {
-          dupes.forEach(function(code) { (seen[code] || []).forEach(function(inp) { inp.style.borderColor = '#c0392b'; }); });
-          woundLiveDupWarning.style.display = 'block';
-          woundLiveDupWarning.innerHTML = '⚠ Duplicate code entered: ' + dupes.map(function(c) { return escapeHtml(c); }).join(', ') + ' — two wound entries below share this code. Firenote will reject this; give one of them a more specific code (stage, laterality, sub-site).';
-        } else {
-          woundLiveDupWarning.style.display = 'none';
-        }
-      }
-
-      // Calls the same backend the ICD-10 Code Lookup tool uses, focused specifically on wound
-      // coding (pressure injury staging, ulcer type, laterality). Returns candidates for the
-      // nurse to pick from — never auto-fills a code without a confirming click.
-      async function suggestWoundCode(descInput, codeInput, suggestBtn, suggestionsWrap) {
-        var desc = descInput.value.trim();
-        if (!desc) { alert('Enter a wound description first, then request a code suggestion.'); return; }
-        var origLabel = suggestBtn.textContent;
-        suggestBtn.disabled = true;
-        suggestBtn.textContent = '⏳ Looking up...';
-        suggestionsWrap.innerHTML = '';
-        suggestionsWrap.style.display = 'none';
-
-        var prompt = 'You are a hospice and wound care ICD-10-CM coding expert. Given the wound description below, return the 2-4 MOST LIKELY specific ICD-10-CM codes. Favor precise codes: pressure injury staging (L89.xxx), ulcer type (venous L97.xxx, arterial I70.xxx/I96, diabetic E11.62x + L97.xxx, other L98.4xx), correct laterality and anatomical sub-site when documented. Never fabricate a code. If the description is ambiguous, still give your best 2-4 ranked candidates from most to least likely — do not refuse.\n\nWound description: "' + desc + '"\n\nRespond ONLY with valid JSON, no markdown, no extra text:\n{"options":[{"code":"L89.153","label":"Pressure ulcer of sacral region, stage 3"},{"code":"L89.154","label":"Pressure ulcer of sacral region, stage 4"}]}';
-
-        try {
-          var resp = await fetch('/.netlify/functions/claude', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt, max_tokens: 800 }) });
-          var data = await resp.json();
-          var rawText = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
-          var clean = rawText.replace(/```json|```/g, '').trim();
-          var parsed = JSON.parse(clean);
-          var opts = Array.isArray(parsed.options) ? parsed.options.filter(function(o) { return o && o.code; }) : [];
-
-          suggestionsWrap.style.display = 'block';
-          if (opts.length === 0) {
-            suggestionsWrap.innerHTML = '<div style="font-size:.8rem;color:var(--text-lt);font-style:italic;padding:4px 0">No confident suggestions — use the ICD-10 Reference instead.</div>';
-          } else {
-            var pickLabel = document.createElement('div');
-            pickLabel.style.cssText = 'font-size:.76rem;color:var(--text-mid);font-style:italic;margin-bottom:4px';
-            pickLabel.textContent = 'Select the most accurate option for this wound:';
-            suggestionsWrap.appendChild(pickLabel);
-            opts.forEach(function(opt) {
-              var optRow = document.createElement('label');
-              optRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:3px;cursor:pointer;font-size:.84rem;padding:5px 8px;border-radius:4px';
-              optRow.addEventListener('mouseover', function() { optRow.style.background = 'var(--row-alt)'; });
-              optRow.addEventListener('mouseout', function() { optRow.style.background = ''; });
-              optRow.innerHTML = '<span style="font-family:monospace;font-size:.78rem;background:var(--row-alt);border:1px solid var(--border);padding:1px 6px;border-radius:3px;flex-shrink:0">' + escapeHtml(opt.code) + '</span><span>' + escapeHtml(opt.label || '') + '</span>';
-              optRow.addEventListener('click', function() {
-                codeInput.value = (opt.code || '').toUpperCase();
-                checkWoundDuplicateCodes();
-              });
-              suggestionsWrap.appendChild(optRow);
-            });
-          }
-        } catch (e) {
-          suggestionsWrap.style.display = 'block';
-          suggestionsWrap.innerHTML = '<div style="font-size:.8rem;color:var(--red)">Could not get suggestions — use the ICD-10 Reference instead.</div>';
-        }
-        suggestBtn.disabled = false;
-        suggestBtn.textContent = origLabel;
-      }
-
-      function buildWoundEntryRow() {
-        var row = document.createElement('div');
-        row.style.cssText = 'padding:10px 11px;background:#fff;border:1px solid #ffe082;border-radius:6px;margin-bottom:8px';
-
-        var descLabel = document.createElement('div');
-        descLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
-        descLabel.textContent = 'Wound description / location';
-        var descInput = document.createElement('input');
-        descInput.type = 'text';
-        descInput.placeholder = 'e.g. Right lower leg, wound #1 — venous stasis ulcer';
-        descInput.style.cssText = 'width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.85rem;margin-bottom:8px;box-sizing:border-box';
-
-        var codeRow = document.createElement('div');
-        codeRow.style.cssText = 'display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px';
-        var codeWrap = document.createElement('div');
-        var codeLabel = document.createElement('div');
-        codeLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
-        codeLabel.textContent = 'ICD-10 code for this wound';
-        var codeInput = document.createElement('input');
-        codeInput.type = 'text';
-        codeInput.className = 'wound-code-input';
-        codeInput.placeholder = 'e.g. L97.219';
-        codeInput.style.cssText = 'width:130px;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:.85rem;text-transform:uppercase';
-        codeInput.addEventListener('input', function() { codeInput.value = codeInput.value.toUpperCase(); checkWoundDuplicateCodes(); });
-        codeWrap.appendChild(codeLabel);
-        codeWrap.appendChild(codeInput);
-
-        var suggestionsWrap = document.createElement('div');
-        suggestionsWrap.style.cssText = 'display:none;margin-top:6px;padding:8px 10px;background:var(--row-alt);border-radius:5px';
-
-        var suggestBtn = document.createElement('button');
-        suggestBtn.type = 'button';
-        suggestBtn.textContent = '🔍 Suggest Code';
-        suggestBtn.style.cssText = 'padding:6px 11px;background:#1a6a9a;color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap';
-        suggestBtn.addEventListener('click', function() { suggestWoundCode(descInput, codeInput, suggestBtn, suggestionsWrap); });
-
-        var refBtn = document.createElement('button');
-        refBtn.type = 'button';
-        refBtn.textContent = '📖 Browse Reference';
-        refBtn.style.cssText = 'padding:6px 11px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap';
-        refBtn.addEventListener('click', function() { switchToIcdRefFromCheckers(document.getElementById('checker-tab-icdref')); });
-
-        codeRow.appendChild(codeWrap);
-        codeRow.appendChild(suggestBtn);
-        codeRow.appendChild(refBtn);
-
-        var actionRow = document.createElement('div');
-        actionRow.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px';
-
-        var genBtn = document.createElement('button');
-        genBtn.type = 'button';
-        genBtn.textContent = '📋 Generate Care Plan for This Wound';
-        genBtn.style.cssText = 'padding:7px 13px;background:var(--navy);color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer';
-        var woundOutput = document.createElement('div');
-        woundOutput.style.cssText = 'display:none;margin-top:10px;padding-top:10px;border-top:1px solid #ffe082';
-        genBtn.addEventListener('click', function() {
-          var desc = descInput.value.trim();
-          var code = codeInput.value.trim();
-          if (!code) { alert('Enter the ICD-10 code for this wound first — use Suggest Code or Browse Reference above if you need to look it up.'); return; }
-          if (!desc) { alert('Enter a description of this wound (location, type) first.'); return; }
-          var details = document.getElementById('tier-patient-details') ? document.getElementById('tier-patient-details').value.trim() : '';
-          generateAndRenderInlineCarePlan(code + ' ' + desc, primaryDx, details, woundOutput, genBtn);
-        });
-
-        var removeRowBtn = document.createElement('button');
-        removeRowBtn.type = 'button';
-        removeRowBtn.textContent = '🗑 Remove';
-        removeRowBtn.style.cssText = 'padding:6px 11px;background:none;color:#c0392b;border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer';
-        removeRowBtn.addEventListener('click', function() { row.remove(); checkWoundDuplicateCodes(); });
-
-        actionRow.appendChild(genBtn);
-        actionRow.appendChild(removeRowBtn);
-
-        row.appendChild(descLabel);
-        row.appendChild(descInput);
-        row.appendChild(codeRow);
-        row.appendChild(suggestionsWrap);
-        row.appendChild(actionRow);
-        row.appendChild(woundOutput);
-        woundEntriesWrap.appendChild(row);
-      }
-
-      buildWoundEntryRow(); // start with one wound entry
-
-      var addWoundBtn = document.createElement('button');
-      addWoundBtn.type = 'button';
-      addWoundBtn.textContent = '+ Add Another Wound';
-      addWoundBtn.style.cssText = 'padding:6px 13px;background:var(--row-alt);color:var(--navy);border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;margin-bottom:12px';
-      addWoundBtn.addEventListener('click', buildWoundEntryRow);
-      woundBody.appendChild(addWoundBtn);
-
-      // Wound care order format reference — this is the ORDER entered in Firenote, separate
-      // from the care plan interventions generated above.
-      var orderFormatWrap = document.createElement('div');
-      orderFormatWrap.style.cssText = 'padding:10px 12px;background:#f5f7fc;border:1px solid var(--border);border-radius:6px';
-      var orderFormatTitle = document.createElement('div');
-      orderFormatTitle.style.cssText = 'font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:6px';
-      orderFormatTitle.textContent = '📝 Wound Care Order Format — enter this structure in the Firenote wound care order';
-      orderFormatWrap.appendChild(orderFormatTitle);
-
-      var woundOrderTemplates = [
-        { label: 'Daily + PRN', text: 'Remove old dressing, cleanse with [cleanser], pat dry, apply [product] to wound bed, cover with [dressing type], secure with [securement]. To be changed daily and PRN. Hospice to do on visit days, facility staff to do on non-visit days and PRN for soiled/dislodged dressing.' },
-        { label: 'Twice Weekly', text: 'Remove old dressing, cleanse with [cleanser], pat dry, apply [product] to wound bed, cover with [dressing type], secure with [securement]. To be changed twice weekly by hospice nurse and PRN by family.' }
-      ];
-      woundOrderTemplates.forEach(function(tpl) {
-        var tRow = document.createElement('div');
-        tRow.style.cssText = 'display:flex;align-items:flex-start;gap:8px;background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:5px;margin-bottom:6px';
-        var tLabel = document.createElement('div');
-        tLabel.style.cssText = 'font-size:.7rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.03em;flex-shrink:0;padding-top:2px;min-width:82px';
-        tLabel.textContent = tpl.label;
-        var tText = document.createElement('span');
-        tText.style.cssText = 'flex:1;font-size:.83rem;line-height:1.5';
-        tText.textContent = tpl.text;
-        var tCopyBtn = document.createElement('button');
-        tCopyBtn.type = 'button';
-        tCopyBtn.textContent = '📋';
-        tCopyBtn.style.cssText = 'flex-shrink:0;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;cursor:pointer';
-        tCopyBtn.addEventListener('click', function() { copyAllCpText(tCopyBtn, tpl.text); });
-        tRow.appendChild(tLabel);
-        tRow.appendChild(tText);
-        tRow.appendChild(tCopyBtn);
-        orderFormatWrap.appendChild(tRow);
-      });
-
-      var fillNote = document.createElement('div');
-      fillNote.style.cssText = 'font-size:.75rem;color:var(--text-lt);font-style:italic;margin-top:2px';
-      fillNote.textContent = 'Replace the bracketed placeholders with the actual cleanser, wound bed product, dressing type, and securement used for this wound.';
-      orderFormatWrap.appendChild(fillNote);
-
-      woundBody.appendChild(orderFormatWrap);
+      mountWoundInfectionBuilder('wound', woundBody,
+        function() { return primaryDx || ''; },
+        function() { var el = document.getElementById('tier-patient-details'); return el ? el.value.trim() : ''; }
+      );
     }
-
     cards.push(woundCard);
   }
 
-  // ── Active Infection ─────────────────────────────────────────────
   if (flags.infection) {
     var infectionCard = makeCard('🦠 Active Infection on Admission', 'QAPI Required + Treatment Order', red, [
       { type: 'flag', label: 'QAPI Event Required', text: 'Document the infection present on admission in the QAPI section before closing this visit.' }
     ]);
     var infectionBody = infectionCard.querySelector('.sit-card-body');
-
     if (infectionBody) {
-      // Duplicate-code warning — same constraint as wounds. A patient can have more than one
-      // infection present at admission (e.g. UTI + cellulitis), and each needs its own distinct
-      // code — Firenote can't hold the same active problem code twice at once.
-      var infDupNote = document.createElement('div');
-      infDupNote.style.cssText = 'font-size:.78rem;color:#7a2020;background:#fdf2f1;border:1px solid #e8b4b0;padding:8px 11px;border-radius:5px;margin-bottom:10px;line-height:1.5';
-      infDupNote.innerHTML = '<strong>⚠ Each infection needs its own distinct ICD-10 code.</strong> If the patient has more than one infection present on admission (e.g. a UTI and cellulitis), each must be coded and care-planned separately — Firenote will not allow the same code to be active twice at the same time.';
-      infectionBody.appendChild(infDupNote);
-
-      var infLiveDupWarning = document.createElement('div');
-      infLiveDupWarning.style.cssText = 'display:none;font-size:.8rem;color:#fff;background:#c0392b;padding:8px 11px;border-radius:5px;margin-bottom:10px;line-height:1.5;font-weight:600';
-      infectionBody.appendChild(infLiveDupWarning);
-
-      var infEntriesWrap = document.createElement('div');
-      infectionBody.appendChild(infEntriesWrap);
-
-      function checkInfectionDuplicateCodes() {
-        var codeInputs = Array.prototype.slice.call(infEntriesWrap.querySelectorAll('.infection-code-input'));
-        var seen = {};
-        var dupes = [];
-        codeInputs.forEach(function(inp) {
-          var v = inp.value.trim().toUpperCase();
-          inp.style.borderColor = 'var(--border)';
-          if (!v) return;
-          if (seen[v]) { if (dupes.indexOf(v) === -1) dupes.push(v); }
-          seen[v] = seen[v] || [];
-          seen[v].push(inp);
-        });
-        if (dupes.length > 0) {
-          dupes.forEach(function(code) { (seen[code] || []).forEach(function(inp) { inp.style.borderColor = '#c0392b'; }); });
-          infLiveDupWarning.style.display = 'block';
-          infLiveDupWarning.innerHTML = '⚠ Duplicate code entered: ' + dupes.map(function(c) { return escapeHtml(c); }).join(', ') + ' — two infection entries below share this code. Firenote will reject this; confirm each infection has its own specific code.';
-        } else {
-          infLiveDupWarning.style.display = 'none';
-        }
-      }
-
-      // Calls the same backend the ICD-10 Code Lookup tool uses, focused on infection coding
-      // (site-specific, organism when documented, acute vs. chronic). Returns candidates for
-      // the nurse to pick from — never auto-fills without a confirming click.
-      async function suggestInfectionCode(descInput, codeInput, suggestBtn, suggestionsWrap) {
-        var desc = descInput.value.trim();
-        if (!desc) { alert('Enter an infection description first, then request a code suggestion.'); return; }
-        var origLabel = suggestBtn.textContent;
-        suggestBtn.disabled = true;
-        suggestBtn.textContent = '⏳ Looking up...';
-        suggestionsWrap.innerHTML = '';
-        suggestionsWrap.style.display = 'none';
-
-        var prompt = 'You are a hospice clinical coding expert specializing in infectious disease ICD-10-CM. Given the infection description below, return the 2-4 MOST LIKELY specific ICD-10-CM codes. Favor precise, site-specific codes (e.g. N39.0 for UTI, L03.xxx for cellulitis by site, J18.9 for pneumonia unspecified organism, J15.x when organism is documented) over vague unspecified codes when the description supports it. Never fabricate a code. If ambiguous, still give your best 2-4 ranked candidates from most to least likely — do not refuse.\n\nInfection description: "' + desc + '"\n\nRespond ONLY with valid JSON, no markdown, no extra text:\n{"options":[{"code":"N39.0","label":"Urinary tract infection, site not specified"},{"code":"N30.00","label":"Acute cystitis without hematuria"}]}';
-
-        try {
-          var resp = await fetch('/.netlify/functions/claude', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt, max_tokens: 800 }) });
-          var data = await resp.json();
-          var rawText = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
-          var clean = rawText.replace(/```json|```/g, '').trim();
-          var parsed = JSON.parse(clean);
-          var opts = Array.isArray(parsed.options) ? parsed.options.filter(function(o) { return o && o.code; }) : [];
-
-          suggestionsWrap.style.display = 'block';
-          if (opts.length === 0) {
-            suggestionsWrap.innerHTML = '<div style="font-size:.8rem;color:var(--text-lt);font-style:italic;padding:4px 0">No confident suggestions — use the ICD-10 Reference instead.</div>';
-          } else {
-            var pickLabel = document.createElement('div');
-            pickLabel.style.cssText = 'font-size:.76rem;color:var(--text-mid);font-style:italic;margin-bottom:4px';
-            pickLabel.textContent = 'Select the most accurate option for this infection:';
-            suggestionsWrap.appendChild(pickLabel);
-            opts.forEach(function(opt) {
-              var optRow = document.createElement('label');
-              optRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:3px;cursor:pointer;font-size:.84rem;padding:5px 8px;border-radius:4px';
-              optRow.addEventListener('mouseover', function() { optRow.style.background = 'var(--row-alt)'; });
-              optRow.addEventListener('mouseout', function() { optRow.style.background = ''; });
-              optRow.innerHTML = '<span style="font-family:monospace;font-size:.78rem;background:var(--row-alt);border:1px solid var(--border);padding:1px 6px;border-radius:3px;flex-shrink:0">' + escapeHtml(opt.code) + '</span><span>' + escapeHtml(opt.label || '') + '</span>';
-              optRow.addEventListener('click', function() {
-                codeInput.value = (opt.code || '').toUpperCase();
-                checkInfectionDuplicateCodes();
-              });
-              suggestionsWrap.appendChild(optRow);
-            });
-          }
-        } catch (e) {
-          suggestionsWrap.style.display = 'block';
-          suggestionsWrap.innerHTML = '<div style="font-size:.8rem;color:var(--red)">Could not get suggestions — use the ICD-10 Reference instead.</div>';
-        }
-        suggestBtn.disabled = false;
-        suggestBtn.textContent = origLabel;
-      }
-
-      function buildInfectionEntryRow() {
-        var row = document.createElement('div');
-        row.style.cssText = 'padding:10px 11px;background:#fff;border:1px solid #ffe082;border-radius:6px;margin-bottom:8px';
-
-        var descLabel = document.createElement('div');
-        descLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
-        descLabel.textContent = 'Infection description / site';
-        var descInput = document.createElement('input');
-        descInput.type = 'text';
-        descInput.placeholder = 'e.g. UTI with E. coli' + String.fromCharCode(160) + '· or · Cellulitis, right lower leg';
-        descInput.style.cssText = 'width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.85rem;margin-bottom:8px;box-sizing:border-box';
-
-        var codeRow = document.createElement('div');
-        codeRow.style.cssText = 'display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px';
-        var codeWrap = document.createElement('div');
-        var codeLabel = document.createElement('div');
-        codeLabel.style.cssText = 'font-size:.74rem;color:var(--text-mid);margin-bottom:3px';
-        codeLabel.textContent = 'ICD-10 code for this infection';
-        var codeInput = document.createElement('input');
-        codeInput.type = 'text';
-        codeInput.className = 'infection-code-input';
-        codeInput.placeholder = 'e.g. N39.0';
-        codeInput.style.cssText = 'width:130px;padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:.85rem;text-transform:uppercase';
-        codeInput.addEventListener('input', function() { codeInput.value = codeInput.value.toUpperCase(); checkInfectionDuplicateCodes(); });
-        codeWrap.appendChild(codeLabel);
-        codeWrap.appendChild(codeInput);
-
-        var suggestionsWrap = document.createElement('div');
-        suggestionsWrap.style.cssText = 'display:none;margin-top:6px;padding:8px 10px;background:var(--row-alt);border-radius:5px';
-
-        var suggestBtn = document.createElement('button');
-        suggestBtn.type = 'button';
-        suggestBtn.textContent = '🔍 Suggest Code';
-        suggestBtn.style.cssText = 'padding:6px 11px;background:#1a6a9a;color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap';
-        suggestBtn.addEventListener('click', function() { suggestInfectionCode(descInput, codeInput, suggestBtn, suggestionsWrap); });
-
-        var refBtn = document.createElement('button');
-        refBtn.type = 'button';
-        refBtn.textContent = '📖 Browse Reference';
-        refBtn.style.cssText = 'padding:6px 11px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap';
-        refBtn.addEventListener('click', function() { switchToIcdRefFromCheckers(document.getElementById('checker-tab-icdref')); });
-
-        codeRow.appendChild(codeWrap);
-        codeRow.appendChild(suggestBtn);
-        codeRow.appendChild(refBtn);
-
-        var actionRow = document.createElement('div');
-        actionRow.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px';
-
-        var genBtn = document.createElement('button');
-        genBtn.type = 'button';
-        genBtn.textContent = '📋 Generate Care Plan for This Infection';
-        genBtn.style.cssText = 'padding:7px 13px;background:var(--navy);color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer';
-        var infOutput = document.createElement('div');
-        infOutput.style.cssText = 'display:none;margin-top:10px;padding-top:10px;border-top:1px solid #ffe082';
-        genBtn.addEventListener('click', function() {
-          var desc = descInput.value.trim();
-          var code = codeInput.value.trim();
-          if (!code) { alert('Enter the ICD-10 code for this infection first — use Suggest Code or Browse Reference above if you need to look it up.'); return; }
-          if (!desc) { alert('Enter a description of this infection (site, organism if known) first.'); return; }
-          var details = document.getElementById('tier-patient-details') ? document.getElementById('tier-patient-details').value.trim() : '';
-          generateAndRenderInlineCarePlan(code + ' ' + desc, primaryDx, details, infOutput, genBtn);
-        });
-
-        var removeRowBtn = document.createElement('button');
-        removeRowBtn.type = 'button';
-        removeRowBtn.textContent = '🗑 Remove';
-        removeRowBtn.style.cssText = 'padding:6px 11px;background:none;color:#c0392b;border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer';
-        removeRowBtn.addEventListener('click', function() { row.remove(); checkInfectionDuplicateCodes(); });
-
-        actionRow.appendChild(genBtn);
-        actionRow.appendChild(removeRowBtn);
-
-        row.appendChild(descLabel);
-        row.appendChild(descInput);
-        row.appendChild(codeRow);
-        row.appendChild(suggestionsWrap);
-        row.appendChild(actionRow);
-        row.appendChild(infOutput);
-        infEntriesWrap.appendChild(row);
-      }
-
-      buildInfectionEntryRow(); // start with one infection entry
-
-      var addInfectionBtn = document.createElement('button');
-      addInfectionBtn.type = 'button';
-      addInfectionBtn.textContent = '+ Add Another Infection';
-      addInfectionBtn.style.cssText = 'padding:6px 13px;background:var(--row-alt);color:var(--navy);border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;margin-bottom:12px';
-      addInfectionBtn.addEventListener('click', buildInfectionEntryRow);
-      infectionBody.appendChild(addInfectionBtn);
-
-      // Treatment order documentation checklist — infections vary far more widely than wound
-      // dressing changes (oral vs. topical vs. IV, drastically different durations), so this is
-      // a completeness checklist rather than one fixed copy-paste sentence.
-      var treatOrderWrap = document.createElement('div');
-      treatOrderWrap.style.cssText = 'padding:10px 12px;background:#f5f7fc;border:1px solid var(--border);border-radius:6px';
-      var treatOrderTitle = document.createElement('div');
-      treatOrderTitle.style.cssText = 'font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:6px';
-      treatOrderTitle.textContent = '📝 Treatment Order — confirm this is entered in Firenote for each infection';
-      treatOrderWrap.appendChild(treatOrderTitle);
-      var treatOrderList = document.createElement('ul');
-      treatOrderList.style.cssText = 'margin:0 0 4px 18px;padding:0;font-size:.83rem;line-height:1.7;color:var(--text)';
-      ['Medication name and route (oral / topical / IV / IM)', 'Dose and frequency', 'Duration of treatment (or "until reassessed")', 'Who administers on visit vs. non-visit days (hospice / facility / family), if applicable', 'Whether this is treatment of an active infection vs. prophylaxis'].forEach(function(item) {
-        var li = document.createElement('li');
-        li.textContent = item;
-        treatOrderList.appendChild(li);
-      });
-      treatOrderWrap.appendChild(treatOrderList);
-      infectionBody.appendChild(treatOrderWrap);
+      mountWoundInfectionBuilder('infection', infectionBody,
+        function() { return primaryDx || ''; },
+        function() { var el = document.getElementById('tier-patient-details'); return el ? el.value.trim() : ''; }
+      );
     }
-
     cards.push(infectionCard);
   }
+
 
   // ── Lives Alone ──────────────────────────────────────────────────
   if (flags.alone) {
@@ -11858,32 +11855,62 @@ function buildSituationalCards(flags, primaryDx, data) {
 }
 
 function renderAllCpCard(body, result, dx, patientDetails) {
-  if (!result || !result.goal) {
+  if (!result || !result.goalFocus) {
     body.innerHTML = '<div style="color:var(--red);font-size:.84rem;padding:8px 0">⚠ Could not generate care plan. Please use the Care Plan Builder tab to generate individually.</div>';
     return;
   }
 
   body.innerHTML = '';
 
-  // Goal section
+  // Goal section — three separate fields matching Firenote's Custom Goal Builder
+  // (Focus / Measurement / Duration), each independently copyable into its own field.
   const goalSec = document.createElement('div');
-  goalSec.style.cssText = 'margin-bottom:12px';
-  const goalLabel = document.createElement('div');
-  goalLabel.style.cssText = 'font-size:.74rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px';
-  goalLabel.textContent = 'Goal';
-  const goalRow = document.createElement('div');
-  goalRow.style.cssText = 'display:flex;align-items:flex-start;gap:8px;background:var(--row-alt);padding:9px 11px;border-radius:5px';
-  const goalText = document.createElement('span');
-  goalText.style.cssText = 'flex:1;font-size:.87rem;line-height:1.55';
-  goalText.textContent = result.goal;
-  const goalCopy = document.createElement('button');
-  goalCopy.style.cssText = 'flex-shrink:0;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;cursor:pointer';
-  goalCopy.textContent = '📋';
-  goalCopy.addEventListener('click', function() { copyAllCpText(goalCopy, result.goal); });
-  goalRow.appendChild(goalText);
-  goalRow.appendChild(goalCopy);
-  goalSec.appendChild(goalLabel);
-  goalSec.appendChild(goalRow);
+  goalSec.style.cssText = 'margin-bottom:12px;display:flex;flex-direction:column;gap:8px';
+
+  function buildGoalFieldRow(labelText, valueText, skipCopy) {
+    const fieldWrap = document.createElement('div');
+    const fieldLabel = document.createElement('div');
+    fieldLabel.style.cssText = 'font-size:.7rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px';
+    fieldLabel.textContent = labelText;
+    const fieldRow = document.createElement('div');
+    fieldRow.style.cssText = 'display:flex;align-items:flex-start;gap:8px;background:var(--row-alt);padding:8px 11px;border-radius:5px';
+    const fieldText = document.createElement('span');
+    fieldText.style.cssText = 'flex:1;font-size:.87rem;line-height:1.5';
+    fieldText.textContent = valueText;
+    fieldRow.appendChild(fieldText);
+    if (skipCopy) {
+      // Duration is a button click in Firenote's Goal Builder, not a text field to paste into.
+      const fieldHint = document.createElement('span');
+      fieldHint.style.cssText = 'flex-shrink:0;font-size:.72rem;color:var(--text-lt);font-style:italic;padding-top:2px;white-space:nowrap';
+      fieldHint.textContent = 'click button';
+      fieldRow.appendChild(fieldHint);
+    } else {
+      const fieldCopy = document.createElement('button');
+      fieldCopy.style.cssText = 'flex-shrink:0;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;cursor:pointer';
+      fieldCopy.textContent = '📋';
+      fieldCopy.addEventListener('click', function() { copyAllCpText(fieldCopy, valueText); });
+      fieldRow.appendChild(fieldCopy);
+    }
+    fieldWrap.appendChild(fieldLabel);
+    fieldWrap.appendChild(fieldRow);
+    return fieldWrap;
+  }
+
+  const goalHeader = document.createElement('div');
+  goalHeader.style.cssText = 'font-size:.74rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em';
+  goalHeader.textContent = 'Goal';
+  goalSec.appendChild(goalHeader);
+
+  const goalCategoryNote = document.createElement('div');
+  goalCategoryNote.style.cssText = 'font-size:.76rem;color:#7a4200;background:#fff8ee;border:1px solid #ffe082;border-radius:5px;padding:5px 9px;margin:2px 0 2px';
+  goalCategoryNote.textContent = '📌 In Firenote\'s Goal Builder, select Category: Custom to unlock the Focus/Measurement/Duration fields below.';
+  goalSec.appendChild(goalCategoryNote);
+
+  goalSec.appendChild(buildGoalFieldRow('Focus', result.goalFocus));
+  goalSec.appendChild(buildGoalFieldRow('Measurement', result.goalMeasurement || ''));
+  // Duration is a button click in Firenote, not a text field — reference only, no copy button.
+  goalSec.appendChild(buildGoalFieldRow('Duration', result.goalDuration || 'end of the current benefit period', true));
+
   body.appendChild(goalSec);
 
   // Interventions section
@@ -13045,7 +13072,7 @@ async function runIcdLookup() {
   var apiBatchErrors = [];
   if (needsApi.length > 0) {
     btn.textContent = '\u23f3 Coding ' + needsApi.length + ' remaining via AI...';
-    const ICD_API_KEY_RULES = '\n\nKEY RULES:\n- CHRONIC RESP FAILURE: J96.10/J96.11/J96.12 only. J96.2x = acute-on-chronic.\n- ATRIAL FIB: I48.91/I48.0/I48.11/I48.19/I48.20 only. Never invent sub-codes.\n- CONSTIPATION: K59.00/K59.01/K59.02/K59.09. K59.1x does NOT exist.\n- PRESSURE INJURIES: Heel=L89.6xx. Sacrum=L89.15x. L89.2xx is ankle not heel.\n- PATHOLOGICAL FRACTURE: M84.451x=neoplastic. M84.551x=other disease. M84.651x=osteoporosis. M84.751x=unspecified. Never swap labels.\n- PROTEIN CALORIE MALNUTRITION: E44.0=MODERATE. E44.1=MILD. E43=severe. E44.2 does NOT exist.\n- FALL RISK: Always needsClarification:true. R29.6=active risk. Z91.81=history only.\n- ASPIRATION RISK: Never Z91.81. Never duplicate dysphagia code. Clarify R13.10 vs J69.0.\n- SUNDOWNING: R41.83 only. Never F05.9.\n- GENERALIZED WEAKNESS: R53.1 only. Never R53.81 or M62.81.\n- NEUROCOGNITIVE: G31.1=senile degeneration only. For Alzheimers/Parkinsons/Lewy Body/FTD/vascular dementia -- return the etiology code (G30.x, G20, G31.83, etc.) only. Do NOT suggest F-codes -- these are handled by a separate tool. If you see a dementia diagnosis without an etiology code, return needsClarification:true.\n- PAIN: Never default generic/unspecified pain ("chronic pain", "persistent pain", "generalized pain") to G89.3. G89.3 (Neoplasm related pain) requires the diagnosis text to explicitly tie the pain to a malignancy (e.g. "cancer pain", "tumor pain", "neoplasm related pain"). Otherwise use G89.29 (other chronic pain) or G89.4 (chronic pain syndrome) as appropriate, or needsClarification:true if genuinely ambiguous.\n- MULTI-DIAGNOSIS LINE: If a single line is a run-on sentence describing more than one distinct clinical condition (e.g. "CHF with edema and dyspnea as well as malnutrition and chronic pain"), do NOT silently pick just one. Return needsClarification:true with options listing each distinct condition you identified as its own {code, label} pair (label should name the specific condition, e.g. "Congestive heart failure \u2014 should be its own line" / "Malnutrition \u2014 should be its own line"), so the nurse can split the line into separate diagnoses rather than losing the others.\n- Never fabricate codes. If uncertain, flag needsClarification:true.\n\n';
+    const ICD_API_KEY_RULES = '\n\nKEY RULES:\n- CHRONIC RESP FAILURE: J96.10/J96.11/J96.12 only. J96.2x = acute-on-chronic.\n- ATRIAL FIB: I48.91/I48.0/I48.11/I48.19/I48.20 only. Never invent sub-codes.\n- CONSTIPATION: K59.00/K59.01/K59.02/K59.09. K59.1x does NOT exist.\n- PRESSURE INJURIES (L89): Elbow=L89.0xx. Back(non-sacral)=L89.1xx. Sacrum=L89.15x specifically. Hip=L89.2xx. Buttock=L89.3xx. Ankle=L89.5xx. Heel=L89.6xx. Never confuse ankle(L89.5) with heel(L89.6), or hip(L89.2) with either.\n- PATHOLOGICAL FRACTURE: M84.451x=neoplastic. M84.551x=other disease. M84.651x=osteoporosis. M84.751x=unspecified. Never swap labels.\n- PROTEIN CALORIE MALNUTRITION: E44.0=MODERATE. E44.1=MILD. E43=severe. E44.2 does NOT exist.\n- FALL RISK: Always needsClarification:true. R29.6=active risk. Z91.81=history only.\n- ASPIRATION RISK: Never Z91.81. Never duplicate dysphagia code. Clarify R13.10 vs J69.0.\n- SUNDOWNING: R41.83 only. Never F05.9.\n- GENERALIZED WEAKNESS: R53.1 only. Never R53.81 or M62.81.\n- NEUROCOGNITIVE: G31.1=senile degeneration only. For Alzheimers/Parkinsons/Lewy Body/FTD/vascular dementia -- return the etiology code (G30.x, G20, G31.83, etc.) only. Do NOT suggest F-codes -- these are handled by a separate tool. If you see a dementia diagnosis without an etiology code, return needsClarification:true.\n- PAIN: Never default generic/unspecified pain ("chronic pain", "persistent pain", "generalized pain") to G89.3. G89.3 (Neoplasm related pain) requires the diagnosis text to explicitly tie the pain to a malignancy (e.g. "cancer pain", "tumor pain", "neoplasm related pain"). Otherwise use G89.29 (other chronic pain) or G89.4 (chronic pain syndrome) as appropriate, or needsClarification:true if genuinely ambiguous.\n- MULTI-DIAGNOSIS LINE: If a single line is a run-on sentence describing more than one distinct clinical condition (e.g. "CHF with edema and dyspnea as well as malnutrition and chronic pain"), do NOT silently pick just one. Return needsClarification:true with options listing each distinct condition you identified as its own {code, label} pair (label should name the specific condition, e.g. "Congestive heart failure \u2014 should be its own line" / "Malnutrition \u2014 should be its own line"), so the nurse can split the line into separate diagnoses rather than losing the others.\n- Never fabricate codes. If uncertain, flag needsClarification:true.\n\n';
     const ICD_API_JSON_SPEC = '\n\nIMPORTANT: When needsClarification is true, options MUST be an array of objects with exactly two fields: "code" and "label" (NOT "description", NOT "name"). Example: [{"code":"I50.22","label":"Chronic systolic CHF, unspecified"},{"code":"I50.32","label":"Chronic diastolic CHF, unspecified"}]\n\nRespond ONLY with valid JSON:\n{"results":[{"diagnosis":"congestive heart failure","code":null,"description":null,"needsClarification":true,"options":[{"code":"I50.22","label":"Chronic systolic CHF, unspecified"},{"code":"I50.32","label":"Chronic diastolic CHF, unspecified"},{"code":"I50.9","label":"CHF unspecified"}]},{"diagnosis":"exact text","code":"I10","description":"Essential hypertension","needsClarification":false,"options":null}]}';
 
     const ICD_API_BATCH_SIZE = 8;
@@ -13979,7 +14006,8 @@ function clearIcdLookup() {
         <button type="button" onclick="cpQuickFillSituational('foley')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">💧 Foley Catheter (Y84.6)</button>
         <button type="button" onclick="cpQuickFillSituational('fallrisk')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">⚠️ Fall Risk</button>
         <button type="button" onclick="cpQuickFillSituational('skinrisk')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">🩹 Skin Breakdown Risk</button>
-        <button type="button" onclick="cpQuickFillSituational('wound')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">🩹 Wound Care</button>
+        <button type="button" onclick="toggleWoundInfectionSection('wound')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">🩹 Wounds</button>
+        <button type="button" onclick="toggleWoundInfectionSection('infection')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">🦠 Infections</button>
         <button type="button" onclick="cpQuickFillSituational('imminent')" style="padding:5px 11px;background:#fff0f0;border:2px solid #c0392b;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:700;color:#c0392b;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#ffd5d5'" onmouseout="this.style.background='#fff0f0'">🕊️ Patient is Imminent</button>
         <button type="button" onclick="cpQuickFillSituational('discharge')"  style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">📋 Discharge / Live Discharge (NLQ)</button>
         <button type="button" onclick="cpQuickFillSituational('respite')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">🔄 Respite Admission</button>
@@ -13988,6 +14016,22 @@ function clearIcdLookup() {
         <button type="button" onclick="cpQuickFillSituational('facility')" style="padding:5px 11px;background:#fff8e1;border:1px solid #ffe082;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#7a4200;cursor:pointer;transition:all .14s" onmouseover="this.style.background='#fff3b0'" onmouseout="this.style.background='#fff8e1'">🏢 Facility Collaboration</button>
       </div>
       <div style="font-size:.74rem;color:var(--text-lt);margin-top:6px;font-style:italic">Pre-fills the problem type, problem text, and goals direction — add your primary diagnosis and patient details then generate</div>
+    </div>
+
+    <!-- Wounds & Infections — interactive multi-entry builder, same functionality as the Care Plan Tiering tool's situational cards -->
+    <div id="cp-wound-section" style="display:none;margin-bottom:16px;padding:12px 14px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+        <div style="font-size:.8rem;font-weight:700;color:#7a4200">🩹 Wounds</div>
+        <button type="button" onclick="toggleWoundInfectionSection('wound')" style="padding:3px 10px;background:none;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.74rem;color:var(--text-mid);cursor:pointer">✕ Close</button>
+      </div>
+      <div id="cp-wound-mount"></div>
+    </div>
+    <div id="cp-infection-section" style="display:none;margin-bottom:16px;padding:12px 14px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+        <div style="font-size:.8rem;font-weight:700;color:#7a4200">🦠 Infections</div>
+        <button type="button" onclick="toggleWoundInfectionSection('infection')" style="padding:3px 10px;background:none;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.74rem;color:var(--text-mid);cursor:pointer">✕ Close</button>
+      </div>
+      <div id="cp-infection-mount"></div>
     </div>
 
     <div class="ai-field">
