@@ -373,6 +373,7 @@ header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 4px
       <h1>LUMINOS HOSPICE <span>ADMISSION TOOLS</span></h1>
       
     </div>
+    <button type="button" class="split-open-btn" onclick="openFirenoteSplit()" title="Open Firenote next to this tool in the same window">🔀 Side-by-side with Firenote</button>
   </div>
   <div class="tab-bar">
     <div class="tab-inner">
@@ -3913,6 +3914,7 @@ The pharmacologic effects of losartan may be decreased by CYP2C9 inhibitors (eg,
     </div>
 
     <div id="tier-check" class="checker-section">
+      <div id="tier-fn-list" class="tier-fn-list" style="display:none"></div>
       <div class="alert info" style="margin-bottom:14px;border-left:3px solid var(--gold)"><span>🗂️</span><div>
         <strong>How this works:</strong> Paste the active problem list, identify the primary hospice diagnosis, and AI will suggest a tier (1, 2, or 3) for each diagnosis using the three-tier framework from the Care Plan walkthrough — plus flag any commonly-related diagnoses that may be missing from the list. <strong>These are suggestions for nurse review, not final care plan decisions.</strong>
       </div></div>
@@ -7963,7 +7965,7 @@ function renderCarePlan(text) {
       ? '<div style="font-size:.76rem;color:#7a4200;background:#fff8ee;border:1px solid #ffe082;border-radius:5px;padding:5px 9px;margin-bottom:8px">📌 In Firenote\'s Goal Builder, select Category: Custom to unlock the Focus/Measurement/Duration fields below.</div>'
       : '';
     out.push(
-      '<div style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">'
+      '<div data-cp-sec="' + escHtml(sec.title.toUpperCase()) + '" style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--row-alt);border-bottom:1px solid var(--border)">'
       + '<span style="font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.08em">' + escHtml(sec.title) + '</span>'
       + '</div>'
@@ -8282,6 +8284,8 @@ var _cpActiveHardcodedProblemText = null;
 
 async function runCarePlanBuilder() {
   const problem = document.getElementById('cp-problem').value.trim();
+  const problemName = dxNameForProse(problem); // diagnosis without its ICD-10 code, for prose
+  const problemCodeNote = icdCodeNoteForPrompt(problem);
   const primaryDx = document.getElementById('cp-primary-dx').value.trim();
   const details = document.getElementById('cp-details').value.trim();
   const goals = document.getElementById('cp-goals').value;
@@ -8378,12 +8382,12 @@ async function runCarePlanBuilder() {
 
 Generate a hospice SAFETY care plan for the following:
 
-CARE PLAN PROBLEM: ${problem}
+CARE PLAN PROBLEM: ${problemName}${problemCodeNote}
 PRIMARY HOSPICE DIAGNOSIS: ${primaryDx || 'Not specified'}
 PATIENT DETAILS: ${details || 'Not provided'}
 SAFETY FOCUS: ${goalsLabel}
 
-CRITICAL: This care plan addresses "${problem}" as a safety or crisis concern. The goal must focus on RISK REDUCTION and PATIENT SAFETY — not comfort or symptom management. Do NOT use comfort-focused hospice goal language.
+CRITICAL: This care plan addresses "${problemName}" as a safety or crisis concern. The goal must focus on RISK REDUCTION and PATIENT SAFETY — not comfort or symptom management. Do NOT use comfort-focused hospice goal language.
 
 REQUIREMENTS:
 
@@ -8421,12 +8425,12 @@ GOAL DURATION: [exact duration value]
 
 Generate a hospice CARE COORDINATION care plan for the following:
 
-CARE PLAN PROBLEM: ${problem}
+CARE PLAN PROBLEM: ${problemName}${problemCodeNote}
 PRIMARY HOSPICE DIAGNOSIS: ${primaryDx || 'Not specified'}
 PATIENT DETAILS: ${details || 'Not provided'}
 COORDINATION FOCUS: ${goalsLabel}
 
-CRITICAL: "${problem}" is a care coordination or planning problem — NOT a clinical diagnosis. The goal must reflect a coordination or transition outcome. Do NOT use clinical symptom-management goal language.
+CRITICAL: "${problemName}" is a care coordination or planning problem — NOT a clinical diagnosis. The goal must reflect a coordination or transition outcome. Do NOT use clinical symptom-management goal language.
 
 REQUIREMENTS:
 
@@ -8435,7 +8439,7 @@ REQUIREMENTS:
    GOAL MEASUREMENT: short phrase (no trailing period) naming the measurable indicator, e.g. "documented care plan agreement between hospice and facility staff"
    GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more appropriate.
 
-2. INTERVENTIONS: Generate a minimum of one ASSESS, one EDUCATE, and one PERFORM intervention. You may add additional individual lines (up to 6 total) if clinically appropriate. Every intervention must be a single standalone line — do NOT group into numbered sections or categories. All must be specific to "${problem}" coordination needs:
+2. INTERVENTIONS: Generate a minimum of one ASSESS, one EDUCATE, and one PERFORM intervention. You may add additional individual lines (up to 6 total) if clinically appropriate. Every intervention must be a single standalone line — do NOT group into numbered sections or categories. All must be specific to "${problemName}" coordination needs:
    ASSESS — Nurse will assess [specific coordination need, readiness, or barrier]
    EDUCATE — Nurse will educate patient/caregiver/facility on [specific coordination topic]
    PERFORM — Nurse will perform or coordinate [specific coordination action]
@@ -8466,12 +8470,12 @@ GOAL DURATION: [exact duration value]
 
 Generate a hospice PSYCHOSOCIAL care plan for the following:
 
-CARE PLAN PROBLEM: ${problem}
+CARE PLAN PROBLEM: ${problemName}${problemCodeNote}
 PRIMARY HOSPICE DIAGNOSIS: ${primaryDx || 'Not specified'}
 PATIENT DETAILS: ${details || 'Not provided'}
 PSYCHOSOCIAL FOCUS: ${goalsLabel}
 
-CRITICAL: "${problem}" is a psychosocial or emotional care problem. The goal must focus on EMOTIONAL SUPPORT, COPING, and WELLBEING — not physical comfort or symptom management.
+CRITICAL: "${problemName}" is a psychosocial or emotional care problem. The goal must focus on EMOTIONAL SUPPORT, COPING, and WELLBEING — not physical comfort or symptom management.
 
 REQUIREMENTS:
 
@@ -8480,7 +8484,7 @@ REQUIREMENTS:
    GOAL MEASUREMENT: short phrase (no trailing period) naming the observable indicator, e.g. "patient/family report of improved emotional adjustment and engagement with support services"
    GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more appropriate.
 
-2. INTERVENTIONS: Generate a minimum of one ASSESS, one EDUCATE, and one PERFORM intervention. You may add additional individual lines (up to 6 total) if clinically appropriate. Every intervention must be a single standalone line — do NOT group into numbered sections or categories. All must be specific to "${problem}":
+2. INTERVENTIONS: Generate a minimum of one ASSESS, one EDUCATE, and one PERFORM intervention. You may add additional individual lines (up to 6 total) if clinically appropriate. Every intervention must be a single standalone line — do NOT group into numbered sections or categories. All must be specific to "${problemName}":
    ASSESS — Nurse will assess [specific psychosocial or emotional indicator]
    EDUCATE — Nurse will educate patient/caregiver on [specific coping or support topic]
    PERFORM — Nurse will perform [specific supportive or referral action]
@@ -8511,12 +8515,12 @@ GOAL DURATION: [exact duration value]
 
 Generate a complete hospice care plan for the following:
 
-CARE PLAN PROBLEM/DIAGNOSIS: ${problem}
+CARE PLAN PROBLEM/DIAGNOSIS: ${problemName}${problemCodeNote}
 PRIMARY HOSPICE DIAGNOSIS: ${primaryDx || 'Not specified'}
 PATIENT DETAILS: ${details || 'Not provided'}
 GOALS OF CARE EMPHASIS: ${goalsLabel}
 
-CRITICAL: This care plan is for the specific problem "${problem}" — NOT for the primary diagnosis. The goal, interventions, and coordination note must all address "${problem}" specifically. Do not write a generic care plan for the primary diagnosis.
+CRITICAL: This care plan is for the specific problem "${problemName}" — NOT for the primary diagnosis. The goal, interventions, and coordination note must all address "${problemName}" specifically. Do not write a generic care plan for the primary diagnosis.
 
 REQUIREMENTS — STRICTLY FOLLOW THESE:
 
@@ -8525,15 +8529,15 @@ REQUIREMENTS — STRICTLY FOLLOW THESE:
    GOAL FOCUS: short phrase (no trailing period), e.g. "optimal comfort, dignity, and quality of life consistent with hospice goals of care, with symptoms (including pain, dyspnea, anxiety, and any other distressing symptoms) managed to the greatest extent possible"
    GOAL MEASUREMENT: short phrase (no trailing period), e.g. "patient/caregiver report of comfort and absence of unnecessary suffering"
    GOAL DURATION: "end of the current benefit period" unless a shorter window is clearly more appropriate.`
-  : `Must be comfort-focused and specific to "${problem}".
-   GOAL FOCUS: short phrase (no trailing period) naming WHAT the goal is about, e.g. "comfort and freedom from ${problem}-related distress" — adapt to the specific problem.
-   GOAL MEASUREMENT: short phrase (no trailing period) naming HOW progress is measured, e.g. "patient report (if able), observed [clinical indicators specific to ${problem}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
+  : `Must be comfort-focused and specific to "${problemName}".
+   GOAL FOCUS: short phrase (no trailing period) naming WHAT the goal is about, e.g. "comfort and freedom from ${problemName}-related distress" — adapt to the specific problem.
+   GOAL MEASUREMENT: short phrase (no trailing period) naming HOW progress is measured, e.g. "patient report (if able), observed [clinical indicators specific to ${problemName}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
    GOAL DURATION: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more clinically appropriate for this specific problem.`}
 
-2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${problem}":
-   ASSESS — Nurse will assess [specific symptom or indicator related to ${problem}] at each visit
-   EDUCATE — Nurse will educate patient/caregiver on [specific topic relevant to ${problem}]
-   PERFORM — Nurse will perform [specific skilled nursing task relevant to ${problem}]
+2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${problemName}":
+   ASSESS — Nurse will assess [specific symptom or indicator related to ${problemName}] at each visit
+   EDUCATE — Nurse will educate patient/caregiver on [specific topic relevant to ${problemName}]
+   PERFORM — Nurse will perform [specific skilled nursing task relevant to ${problemName}]
 
    You may add additional ASSESS, EDUCATE, or PERFORM interventions beyond the minimum three. Do NOT use any other intervention type labels.
 ${requiredPrimaryBlock}
@@ -8570,7 +8574,33 @@ GOAL DURATION: [exact duration value]
     const text = data.content && data.content[0] && data.content[0].text
       ? data.content[0].text
       : (data.error || 'No response received.');
-    outputEl.innerHTML = renderCarePlan(text);
+    const cleanText = stripIcdCodes(text, icdCodesInText(problem));
+    outputEl.innerHTML = renderCarePlan(cleanText);
+    // "Show different intervention options" under the Interventions section
+    (function() {
+      var ivSecEl = Array.prototype.find.call(outputEl.querySelectorAll('[data-cp-sec]'), function(el) { return /INTERVENTION/.test(el.getAttribute('data-cp-sec')); });
+      var target = ivSecEl ? ivSecEl.lastElementChild : outputEl;
+      var existing = cleanText.split('\n').map(function(l) { return l.trim().replace(/\*\*/g, ''); })
+        .filter(function(l) { return /^(ASSESS|EDUCATE|PERFORM|INTERVENE|DOCUMENT)\b/i.test(l); });
+      mountMoreInterventions(target, {
+        problem: problem, primaryDx: primaryDx, details: details, existing: existing,
+        renderRow: function(prefix, txt, into) {
+          var color = prefix === 'ASSESS' ? 'var(--blue)' : prefix === 'EDUCATE' ? 'var(--green)' : 'var(--gold)';
+          var bg = prefix === 'ASSESS' ? '#eef3fb' : prefix === 'EDUCATE' ? 'var(--green-bg)' : 'var(--amber-bg)';
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;gap:10px;align-items:flex-start;margin:5px 0;padding:8px 12px;background:' + bg + ';border-radius:6px;border-left:3px solid ' + color;
+          row.innerHTML = '<span style="font-size:.72rem;font-weight:700;color:' + color + ';text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;min-width:58px">' + prefix + '</span>'
+            + '<span style="font-size:.88rem;color:var(--text);flex:1"></span>';
+          row.children[1].textContent = txt;
+          var cb = document.createElement('button');
+          cb.textContent = '📋';
+          cb.style.cssText = 'margin-left:6px;padding:4px 10px;flex-shrink:0;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.75rem;cursor:pointer';
+          cb.addEventListener('click', function() { copyAllCpText(cb, txt); });
+          row.appendChild(cb);
+          into.appendChild(row);
+        }
+      });
+    })();
     outputWrap.classList.add('show');
     outputWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
   } catch(err) {
@@ -8781,24 +8811,53 @@ function buildNarrativePrompt() {
 
   if (!draft) { alert('Please enter your draft narrative or notes first.'); return; }
 
+  // Length target based on the nurse's own input. Shorthand drafts grow when written as
+  // sentences (~1.8x); a pasted Review & Finish is long and fact-dense. Floor 150 / ceiling
+  // 450 words. Facts always outrank length — see KEEP EVERY FACT rule in the prompt.
+  const draftWords = draft.split(/\s+/).filter(Boolean).length;
+  const narrMax = Math.max(150, Math.min(450, Math.round(draftWords * 1.8)));
+  const narrMin = Math.max(100, Math.round(narrMax * 0.6));
+  const narrTarget = narrMin + '–' + narrMax + ' words';
+
   const prompt = `You are an expert hospice clinical documentation specialist with deep knowledge of CMS hospice benefit standards, 42 CFR §418, LCD requirements, MAC audit guidance, and NHPCO guidelines.
 
-A hospice admission nurse needs help strengthening a clinical nursing narrative. Please:
-1. Rewrite it with stronger clinical language in first-person nursing voice, past tense, professional clinical tone, paragraph form — no bullet points
-2. Ensure ALL of the following required hospice admission elements are present and clearly documented:
+A hospice admission nurse needs help tightening up her admission narrative. Please:
+1. Rewrite it so it reads like a skilled, experienced hospice RN wrote it herself at the end of the visit — clear, specific, and believable to an auditor as genuine nurse charting (see LENGTH AND VOICE RULES below)
+2. Make sure each of these required hospice admission elements that IS in the draft comes through clearly (routine items like medication review, verbal certification, and IDG coordination need only one short sentence each; depression screening must state the tool and RESULT if given, e.g. "PHQ-2 negative" or "PHQ-9 score 6"):
    - Patient and caregiver identification and relationship
    - Primary diagnosis and related conditions with symptom burden
    - LCD criteria documentation (functional decline, clinical indicators supporting 6-month prognosis)
    - Pain assessment findings (scale, location, character, current management)
-   - Symptom assessment (dyspnea, nausea, anxiety, agitation, constipation as applicable)
    - Medication review (hospice-covered medications, supplies, and DME reviewed with patient/family/legal representative)
-   - Depression screening documented
+   - Depression screening with result (tool and score/outcome)
    - Verbal certification status (obtained, or transfer patient exception noted)
    - IDG coordination statement
    - Goals of care and patient/family understanding of hospice philosophy
-3. Return a checklist showing each element as PRESENT, PARTIAL, or MISSING with a brief note
+3. Return a checklist showing each element above as PRESENT, PARTIAL, or MISSING with a brief note. Do NOT add a checklist line for symptom screening / symptom impact assessment — that is documented in the structured section of the Firenote note, not required in the narrative. (Symptom findings that ARE in the draft still belong in the narrative.)
 
 CRITICAL — DO NOT WRITE ABOUT GAPS INSIDE THE NARRATIVE ITSELF: The STRENGTHENED NARRATIVE section must describe ONLY what actually happened during the visit and what was actually assessed or documented in the draft notes below. NEVER write sentences in the narrative stating that something "was not included," "was not documented," "should be completed," "is missing from the notes," or similar — that kind of statement must NEVER appear inside the narrative text, because this narrative may be copied directly into the permanent clinical record, and a sentence documenting that documentation is missing becomes a compliance liability once it's in the chart. If an element is missing or incomplete, simply omit any mention of it from the narrative and instead flag it ONLY in the ELEMENT CHECKLIST section below, marked MISSING or PARTIAL. The narrative and the checklist serve different purposes: the narrative describes the visit as documented; the checklist tells the nurse what still needs follow-up before this narrative can be considered complete.
+
+LENGTH AND VOICE RULES — THESE MATTER AS MUCH AS CONTENT:
+- KEEP EVERY PROGNOSTIC FACT — THIS OUTRANKS LENGTH: Never drop a fact to save words. Cut wording, not facts. Every one of these that appears in the input MUST appear in the narrative:
+  • functional scores (PPS, FAST, KPS, NYHA) and ADL dependence / assist level
+  • weights, weight loss (amount + timeframe), MAC, intake
+  • vital signs — one compact line is fine (e.g. "VS: BP 170/70, HR 65, RR 18, SpO2 97% RA, T 98.0, wt 125 lb")
+  • hospitalizations, ED visits, infections, procedures, with dates
+  • every comorbidity or finding contributing to decline — especially masses, suspected malignancy, organ failure
+  • abnormal labs (values can be listed compactly)
+  • symptoms with severity/scores, pain location/character/score/goal
+  • comfort meds by name with purpose (a short list is fine), DME and supplies
+  • depression screening tool and result (e.g. "PHQ-2 negative")
+  • education provided and to whom, family understanding, MD/verbal cert, IDG
+- LENGTH: Target ${narrTarget}, achieved by tight wording — short sentences, compact lists, no repetition, no filler, no summarizing conclusions ("consistent with limited prognosis…"). If every fact above cannot fit, go over the target rather than drop a fact. Never pad a short draft with invented detail.
+- VOICE: First person, past tense, the way a nurse actually charts ("I met with pt and daughter at bedside…", "Pt reports…", "Daughter states…"). Plain, direct sentences of normal length. Common nursing abbreviations are fine where a nurse would use them (pt, CG, PRN, SOB, PPS, FAST, O2, BLE, hx).
+- FACTS OVER ADJECTIVES: Keep every number, score, and observation from the draft (weights, PPS/FAST/MAC, pain scores, intake, hospitalizations, falls). These carry the prognosis — not descriptive language.
+- DO NOT USE these phrasings, which read as AI-written: "comprehensive", "holistic", "robust", "multifaceted", "meticulous", "it is important to note", "notably", "furthermore", "additionally", "moreover", "demonstrates", "underscores", "highlights", "in alignment with", "ensuring", "in order to", "a testament to", "navigating", "journey", strings of 3+ adjectives, or sentences that restate the same point twice.
+- NO REGULATORY LANGUAGE IN THE NARRATIVE: never mention CMS, LCD, 42 CFR, Medicare criteria, "meets eligibility", or "supports a prognosis of six months or less" — describe the clinical findings and let them speak for themselves.
+- Do not add symptoms, negatives ("denies X, Y, Z…"), findings, or education that are not in the draft.
+
+TONE EXAMPLE (style only — do NOT copy any content from it):
+"I met with pt and her daughter (primary CG) at bedside. Pt is bedbound, PPS 30%, and has lost 12 lbs since August per daughter. She is eating 2–3 bites per meal and sleeps most of the day. Reported pain 4/10 to lower back, relieved with PRN morphine. Hospice philosophy, covered meds, and DME reviewed with daughter, who verbalized understanding and agreed with comfort-focused goals."
 
 PRIMARY HOSPICE DIAGNOSIS: ${dx || 'Not specified — infer from narrative'}
 
@@ -8808,7 +8867,7 @@ ${draft}
 FORMAT YOUR RESPONSE EXACTLY AS:
 
 STRENGTHENED NARRATIVE:
-[Full rewritten narrative — paragraphs only, no headers, no bullets, first-person past tense. Describes ONLY what was actually documented/assessed. Contains NO commentary about missing, absent, or incomplete documentation — that belongs exclusively in the checklist below.]
+[Rewritten narrative — about ${narrTarget} (facts first; never drop a documented fact to hit the length), 2–4 short paragraphs, no headers, no bullets, first-person past tense, written the way an experienced hospice RN actually charts. Describes ONLY what was actually documented/assessed. Contains NO commentary about missing, absent, or incomplete documentation — that belongs exclusively in the checklist below.]
 
 ---
 
@@ -8838,6 +8897,7 @@ function clearNarrative() {
   const wrap = document.getElementById('narr-output-wrap');
   if (wrap) wrap.classList.remove('show');
   const pasteBack = document.getElementById('narr-paste-back');
+  var _nlc = document.getElementById('narr-length-check'); if (_nlc) _nlc.style.display = 'none';
   if (pasteBack) pasteBack.value = '';
   const chkDisplay = document.getElementById('narr-chk-display');
   if (chkDisplay) chkDisplay.classList.remove('show');
@@ -8882,6 +8942,27 @@ function handleNarrativePasteBack() {
   if (!ta) return;
   const cleaned = parseNarrativeChecklist(ta.value);
   if (cleaned !== ta.value) ta.value = cleaned;
+  showNarrativeLengthCheck(ta);
+}
+
+// Quiet length note: only appears when a pasted-back narrative is unusually long for
+// a nursing note. No phrase-level flags (removed Oct 2026 per Josh).
+function showNarrativeLengthCheck(ta) {
+  var box = document.getElementById('narr-length-check');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'narr-length-check';
+    box.style.cssText = 'margin-top:6px;font-size:.78rem;color:var(--text-lt);display:none';
+    ta.parentNode.insertBefore(box, ta.nextSibling);
+  }
+  var text = (ta.value || '').trim();
+  var words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  if (words > 500) {
+    box.textContent = words + ' words — on the long side for an admission narrative. You can ask Copilot to "tighten the wording without removing any clinical facts."';
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
 }
 
 // Tracks the most recently parsed checklist state (missing/partial counts) so
@@ -8907,6 +8988,14 @@ function parseNarrativeChecklist(rawText) {
       break;
     }
   }
+
+  // Strip Copilot's own section label ("STRENGTHENED NARRATIVE:", "**Revised Narrative**", "## Narrative")
+  // from the top, and the "---" divider it leaves before the checklist, so the box holds only the
+  // narrative text that goes into Firenote.
+  narrativePart = narrativePart
+    .replace(/^\s*(?:#{1,6}\s*)?(?:\*{1,2})?\s*(?:STRENGTHENED|REVISED|REWRITTEN|UPDATED|FINAL|IMPROVED)?\s*(?:RN\s+|NURSING\s+|ADMISSION\s+)*NARRATIVE\s*:?\s*(?:\*{1,2})?\s*:?[ \t]*(?:\r?\n)+/i, '')
+    .replace(/(?:\r?\n)\s*[-–—_*]{3,}\s*$/, '')
+    .trim();
 
   // Safety-net check: flag any sentence in the narrative itself that describes documentation
   // gaps rather than the visit — this must never be copied into the permanent clinical record.
@@ -9736,29 +9825,31 @@ function cpQuickFillAndGenerate(problem, primary, details) {
 // inline "Generate Care Plan" buttons on situational cards (wound, infection, opioid-induced
 // constipation) so the result renders right there in the card instead of switching tabs.
 async function generateInlineCarePlanResult(problemText, primaryDx, patientDetails) {
+  const problemName = dxNameForProse(problemText);
+  const problemCodeNote = icdCodeNoteForPrompt(problemText);
   const prompt = `You are an expert hospice clinical documentation specialist with deep knowledge of CMS hospice benefit standards, 42 CFR §418, LCD requirements, and NHPCO guidelines.
 
 Generate a complete hospice care plan for the following:
 
-CARE PLAN PROBLEM/DIAGNOSIS: ${problemText}
+CARE PLAN PROBLEM/DIAGNOSIS: ${problemName}${problemCodeNote}
 PRIMARY HOSPICE DIAGNOSIS: ${primaryDx || 'Not specified'}
 PATIENT DETAILS: ${patientDetails || 'Not provided'}
 GOALS OF CARE EMPHASIS: comfort and symptom management
 
-CRITICAL: This care plan is for the specific problem "${problemText}" — NOT for the primary diagnosis. The goal, interventions, and coordination note must all address "${problemText}" specifically. Do not write a generic care plan for the primary diagnosis.
+CRITICAL: This care plan is for the specific problem "${problemName}" — NOT for the primary diagnosis. The goal, interventions, and coordination note must all address "${problemName}" specifically. Do not write a generic care plan for the primary diagnosis.
 
 REQUIREMENTS — STRICTLY FOLLOW THESE:
 
-1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence. Generate each specific to "${problemText}":
-   - goalFocus: A short phrase (not a full sentence, no trailing period) naming WHAT the goal is about. Format example: "comfort and freedom from ${problemText}-related distress" — adapt the wording to the specific problem.
-   - goalMeasurement: A short phrase (not a full sentence, no trailing period) naming HOW progress will be measured — the observable/reportable indicators. Format example: "patient report (if able), observed [clinical indicators specific to ${problemText}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
+1. GOAL — Firenote's Custom Goal Builder now requires three separate fields instead of one sentence. Generate each specific to "${problemName}":
+   - goalFocus: A short phrase (not a full sentence, no trailing period) naming WHAT the goal is about. Format example: "comfort and freedom from ${problemName}-related distress" — adapt the wording to the specific problem.
+   - goalMeasurement: A short phrase (not a full sentence, no trailing period) naming HOW progress will be measured — the observable/reportable indicators. Format example: "patient report (if able), observed [clinical indicators specific to ${problemName}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
    - goalDuration: Must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more clinically appropriate for this specific problem.
 
-2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${problemText}" and follow this exact structure:
+2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${problemName}" and follow this exact structure:
 
-   ASSESS — Nurse will assess [specific symptom or indicator related to ${problemText}] at each visit
-   EDUCATE — Nurse will educate patient/caregiver on [specific topic relevant to ${problemText}]
-   PERFORM — Nurse will perform [specific skilled nursing task relevant to ${problemText}]
+   ASSESS — Nurse will assess [specific symptom or indicator related to ${problemName}] at each visit
+   EDUCATE — Nurse will educate patient/caregiver on [specific topic relevant to ${problemName}]
+   PERFORM — Nurse will perform [specific skilled nursing task relevant to ${problemName}]
 
    You may add additional ASSESS, EDUCATE, or PERFORM interventions beyond the minimum three if clinically appropriate for the problem. Do NOT use any other intervention type labels.
 
@@ -11746,12 +11837,12 @@ async function buildAllTier1CarePlans(data, primaryDx, container, flags) {
 
 Generate a complete hospice care plan for the following:
 
-CARE PLAN PROBLEM/DIAGNOSIS: ${it.diagnosis}
+CARE PLAN PROBLEM/DIAGNOSIS: ${dxNameForProse(it.diagnosis)}${icdCodeNoteForPrompt(it.diagnosis)}
 PRIMARY HOSPICE DIAGNOSIS: ${primaryDx || 'Not specified'}
 PATIENT DETAILS: ${patientDetails || 'Not provided'}
 GOALS OF CARE EMPHASIS: ${goalsEmphasis}
 
-CRITICAL: This care plan is for the specific problem "${it.diagnosis}" — NOT for the primary diagnosis. The goal, interventions, and coordination note must all address "${it.diagnosis}" specifically. Do not write a generic care plan for the primary diagnosis.
+CRITICAL: This care plan is for the specific problem "${dxNameForProse(it.diagnosis)}" — NOT for the primary diagnosis. The goal, interventions, and coordination note must all address "${dxNameForProse(it.diagnosis)}" specifically. Do not write a generic care plan for the primary diagnosis.
 
 REQUIREMENTS — STRICTLY FOLLOW THESE:
 
@@ -11760,16 +11851,16 @@ REQUIREMENTS — STRICTLY FOLLOW THESE:
    - goalFocus: short phrase (no trailing period), e.g. "optimal comfort, dignity, and quality of life consistent with hospice goals of care, with symptoms (including pain, dyspnea, anxiety, and any other distressing symptoms) managed to the greatest extent possible"
    - goalMeasurement: short phrase (no trailing period), e.g. "patient/caregiver report of comfort and absence of unnecessary suffering"
    - goalDuration: "end of the current benefit period" unless a shorter window is clearly more appropriate.`
-  : `Specific to "${it.diagnosis}".
-   - goalFocus: short phrase (no trailing period) naming WHAT the goal is about, e.g. "comfort and freedom from ${it.diagnosis}-related distress" — adapt to the specific problem.
-   - goalMeasurement: short phrase (no trailing period) naming HOW progress is measured, e.g. "patient report (if able), observed [clinical indicators specific to ${it.diagnosis}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
+  : `Specific to "${dxNameForProse(it.diagnosis)}".
+   - goalFocus: short phrase (no trailing period) naming WHAT the goal is about, e.g. "comfort and freedom from ${dxNameForProse(it.diagnosis)}-related distress" — adapt to the specific problem.
+   - goalMeasurement: short phrase (no trailing period) naming HOW progress is measured, e.g. "patient report (if able), observed [clinical indicators specific to ${dxNameForProse(it.diagnosis)}], and trends in caregiver feedback" — adapt the clinical indicators to the specific problem.
    - goalDuration: must be EXACTLY one of these values (matching Firenote's duration buttons, do not invent others): "3 days", "7 days", "14 days", "30 days", "60 days", "90 days", "180 days", "end of the current benefit period". Use "end of the current benefit period" unless a shorter reassessment window is clearly more clinically appropriate for this specific problem.`}
 
-2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${it.diagnosis}" and follow this exact structure:
+2. INTERVENTIONS: Generate a minimum of 3 interventions — one of each type below, plus additional as clinically appropriate (up to 6 total). Every intervention MUST be specific to "${dxNameForProse(it.diagnosis)}" and follow this exact structure:
 
-   ASSESS — Nurse will assess [specific symptom or indicator related to ${it.diagnosis}] at each visit
-   EDUCATE — Nurse will educate patient/caregiver on [specific topic relevant to ${it.diagnosis}]
-   PERFORM — Nurse will perform [specific skilled nursing task relevant to ${it.diagnosis}]
+   ASSESS — Nurse will assess [specific symptom or indicator related to ${dxNameForProse(it.diagnosis)}] at each visit
+   EDUCATE — Nurse will educate patient/caregiver on [specific topic relevant to ${dxNameForProse(it.diagnosis)}]
+   PERFORM — Nurse will perform [specific skilled nursing task relevant to ${dxNameForProse(it.diagnosis)}]
 
    You may add additional ASSESS, EDUCATE, or PERFORM interventions beyond the minimum three if clinically appropriate for the problem. Do NOT use any other intervention type labels.
    IMPORTANT: Do NOT include interventions about medication administration responsibility, bereavement assessment, or Full Code status in this list -- those are added separately.
@@ -12156,7 +12247,108 @@ function buildSituationalCards(flags, primaryDx, data) {
   return cards;
 }
 
+// ── "Show different intervention options" (Oct 2026) ─────────────────────
+// Adds new AI-suggested interventions BELOW the existing ones (nothing is replaced),
+// telling the AI what is already on screen so it doesn't repeat itself. Goal and REQ
+// groups are untouched. Sends only the problem name, primary dx, and the nurse's optional
+// focus text — the same clinical (non-identifying) content the original generation used.
+function mountMoreInterventions(container, ctx) {
+  if (!container) return;
+  var shown = (ctx.existing || []).slice();
+  var round = 0;
+  var wrap = document.createElement('div');
+  wrap.className = 'more-iv';
+  wrap.innerHTML = '<div class="more-iv-row">'
+    + '<input type="text" class="more-iv-focus" placeholder="Optional: what are you looking for? (e.g. fall prevention, caregiver teaching)">'
+    + '<button type="button" class="more-iv-btn">🔄 Show different intervention options</button></div>'
+    + '<div class="more-iv-out"></div>';
+  container.appendChild(wrap);
+  var btn = wrap.querySelector('.more-iv-btn'), focusEl = wrap.querySelector('.more-iv-focus'), out = wrap.querySelector('.more-iv-out');
+  btn.addEventListener('click', async function() {
+    var orig = btn.textContent; btn.disabled = true; btn.textContent = '⏳ Getting new options…';
+    var focus = focusEl.value.trim();
+    var prompt = 'You are an expert hospice clinical documentation specialist (CMS hospice benefit, 42 CFR §418).'
+      + '\n\nCARE PLAN PROBLEM: ' + dxNameForProse(ctx.problem)
+      + '\nPRIMARY HOSPICE DIAGNOSIS: ' + (dxNameForProse(ctx.primaryDx || '') || 'Not specified')
+      + (ctx.details ? '\nPATIENT DETAILS: ' + ctx.details : '')
+      + (focus ? '\nTHE NURSE IS SPECIFICALLY LOOKING FOR: ' + focus : '')
+      + '\n\nThe nurse already has these interventions and wants DIFFERENT ones — do not repeat or reword any of them:\n'
+      + shown.map(function(t) { return '- ' + t; }).join('\n')
+      + '\n\nWrite 4-6 NEW nursing interventions specific to this problem. Rules: comfort-focused, never curative; each starts with ASSESS:, EDUCATE:, or PERFORM: followed by "Nurse will..."; include at least one of each type unless the nurse\'s focus clearly calls for one type; concrete and Firenote-ready; NEVER include ICD-10 codes.'
+      + '\n\nRespond ONLY with JSON: {"interventions":["ASSESS: Nurse will ...","EDUCATE: Nurse will ...","PERFORM: Nurse will ..."]}';
+    try {
+      var resp = await fetch('/.netlify/functions/claude', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ prompt: prompt, max_tokens: 1200 }) });
+      var data = await resp.json();
+      if (!resp.ok || data.error) throw new Error(data.error || ('HTTP ' + resp.status));
+      var parsed = icdParseAiJson(data.content && data.content[0] && data.content[0].text);
+      var codes = icdCodesInText(ctx.problem);
+      var bare = function(t) { return String(t).replace(/^(ASSESS|EDUCATE|PERFORM|INTERVENE|DOCUMENT)[:\s\u2014\-]+\s*/i, '').slice(0, 50).toLowerCase(); };
+      var seen = shown.map(bare);
+      var items = (parsed.interventions || []).map(function(iv) {
+        var m = String(iv).trim().match(/^(ASSESS|EDUCATE|PERFORM)[:\s—\-]+\s*(.*)$/i);
+        return m ? { prefix: m[1].toUpperCase(), text: stripIcdCodes(m[2], codes) } : null;
+      }).filter(function(x) { return x && x.text && seen.indexOf(bare(x.text)) === -1; });
+      if (!items.length) { btn.disabled = false; btn.textContent = orig; alert('The AI only came back with options you already have. Try typing what you\'re looking for in the box (e.g. "pain at night", "caregiver teaching") and click again.'); return; }
+      round++;
+      var grp = document.createElement('div');
+      grp.className = 'more-iv-grp';
+      grp.innerHTML = '<div class="more-iv-hd">New options' + (round > 1 ? ' — set ' + round : '') + (focus ? ' · focus: ' + escapeHtml(focus) : '') + '</div>';
+      items.forEach(function(it) { ctx.renderRow(it.prefix, it.text, grp); shown.push(it.prefix + ': ' + it.text); });
+      out.appendChild(grp);
+      btn.textContent = '🔄 Show more options';
+      btn.disabled = false;
+    } catch (e) {
+      btn.disabled = false; btn.textContent = orig;
+      alert('Could not get new options right now (' + e.message + '). Please try again.');
+    }
+  });
+}
+
+// ── Keep ICD-10 codes OUT of care plan prose (Oct 2026) ──────────────────
+// Diagnoses arrive as "N18.4 Chronic kidney disease stage 4". The code belongs on the
+// problem title, never inside a goal or intervention sentence. Only codes that appear in
+// the diagnosis itself are stripped, so policy references like Z91.89 elsewhere are untouched.
+var ICD_CODE_TOKEN = /[A-TV-Z][0-9][0-9A-Z](?:\.[0-9A-Z]{1,4})?/;
+function icdCodesInText(s) {
+  var out = [], str = String(s || '');
+  var lead = str.match(/^\s*\(?([A-TV-Z][0-9][0-9A-Z](?:\.[0-9A-Z]{1,4})?)\)?(?=[\s\-–—:]|$)/);
+  if (lead) out.push(lead[1]);
+  (str.match(/\(([A-TV-Z][0-9][0-9A-Z](?:\.[0-9A-Z]{1,4})?)\)/g) || []).forEach(function(m) { out.push(m.replace(/[()]/g, '')); });
+  (str.match(/\b[A-TV-Z][0-9][0-9A-Z]\.[0-9A-Z]{1,4}\b/g) || []).forEach(function(m) { out.push(m); });
+  return out.filter(function(c, i) { return out.indexOf(c) === i; });
+}
+var ICD_PROPER_NOUNS = /^(Alzheimer|Parkinson|Lewy|Huntington|Pick|Crohn|Hodgkin|Kaposi|Guillain|Creutzfeldt|Paget|Raynaud|Cushing|Addison|Graves|Hashimoto|Sjogren|Wernicke|Korsakoff|Down|Lou)\b/;
+function stripIcdCodes(text, codes) {
+  var t = String(text || '');
+  (codes || []).forEach(function(c) {
+    var esc = c.replace(/\./g, '\\.');
+    t = t.replace(new RegExp('(^|[\\s(\\[])' + '\\(?' + esc + '\\)?' + '(?![0-9A-Z.])(\\s+[-–—:]\\s*|\\s*:\\s*|\\s+)?', 'g'), function(m, pre, offset) {
+      return pre === '(' || pre === '[' ? '' : pre;
+    });
+  });
+  t = t.replace(/\(\s*\)/g, '').replace(/ +-(?=[a-z])/g, '-').replace(/[ \t]{2,}/g, ' ').replace(/ +([,.;)])/g, '$1');
+  // "freedom from Chronic kidney disease" → "freedom from chronic kidney disease" (mid-sentence only, not proper nouns or acronyms)
+  t = t.replace(/([a-z,] )([A-Z][a-z]+)(?=[\s\-])/g, function(m, pre, word) { return ICD_PROPER_NOUNS.test(word) ? m : pre + word.toLowerCase(); });
+  return t.trim();
+}
+function dxNameForProse(dx) { return stripIcdCodes(dx, icdCodesInText(dx)).replace(/^[\s\-–—:]+/, '') || String(dx || ''); }
+function icdCodeNoteForPrompt(dx) {
+  var codes = icdCodesInText(dx);
+  return codes.length ? '\nICD-10 CODE (reference only): ' + codes.join(', ') + '. NEVER write any ICD-10 code inside the goal, measurement, interventions, or any other output text — refer to the condition by name only, in natural clinical wording.' : '';
+}
+function cleanCarePlanResultCodes(result, dx) {
+  if (!result) return result;
+  var codes = icdCodesInText(dx);
+  if (!codes.length) return result;
+  ['goalFocus', 'goalMeasurement', 'goalDuration', 'physicianCoordination'].forEach(function(k) {
+    if (typeof result[k] === 'string') result[k] = stripIcdCodes(result[k], codes);
+  });
+  if (Array.isArray(result.interventions)) result.interventions = result.interventions.map(function(iv) { return typeof iv === 'string' ? stripIcdCodes(iv, codes) : iv; });
+  return result;
+}
+
 function renderAllCpCard(body, result, dx, patientDetails) {
+  cleanCarePlanResultCodes(result, dx);
   if (!result || !result.goalFocus) {
     body.innerHTML = '<div style="color:var(--red);font-size:.84rem;padding:8px 0">⚠ Could not generate care plan. Please use the Care Plan Builder tab to generate individually.</div>';
     return;
@@ -12263,6 +12455,15 @@ function renderAllCpCard(body, result, dx, patientDetails) {
   }
 
   clinicalIvs.forEach(function(iv) { renderIvRow(iv.prefix, iv.text, ivSec); });
+  if (!result._noMoreIv) {
+    mountMoreInterventions(ivSec, {
+      problem: dx || '',
+      primaryDx: (typeof tierCurrentPrimaryDx !== 'undefined' && tierCurrentPrimaryDx) || ((document.getElementById('tier-primary') || {}).value || ''),
+      details: patientDetails || '',
+      existing: clinicalIvs.map(function(iv) { return iv.prefix + ': ' + iv.text; }).concat(requiredGroups.reduce(function(a, g) { return a.concat(g.items.map(function(i) { return i.prefix + ': ' + i.text; })); }, [])),
+      renderRow: renderIvRow
+    });
+  }
 
   // Render required groups
   requiredGroups.forEach(function(grp) {
@@ -12547,6 +12748,7 @@ function escapeHtml(str) {
 }
 
 function clearTierChecker() {
+  var _tfl = document.getElementById('tier-fn-list'); if (_tfl) { _tfl.style.display = 'none'; _tfl.innerHTML = ''; }
   ['tier-primary','tier-input','tier-patient-details'].forEach(function(id) {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -12608,6 +12810,24 @@ function buildLocalIcdDatabase() {
 
 // Additional synonym/alias mappings not in the Reference database
 var LOCAL_ICD_SYNONYMS = {
+  // Added Oct 2026 after bedside misses — high-frequency entries
+  'type 2 diabetes mellitus': { code: null, desc: null, resolve: false, clarify: true, options: [
+    { code: 'E11.9',  label: 'Type 2 diabetes mellitus without complications' },
+    { code: 'E11.65', label: 'Type 2 diabetes mellitus with hyperglycemia' },
+    { code: 'E11.649', label: 'Type 2 diabetes mellitus with hypoglycemia without coma' },
+    { code: 'E11.22', label: 'Type 2 diabetes mellitus with diabetic chronic kidney disease' },
+    { code: 'E11.40', label: 'Type 2 diabetes mellitus with diabetic neuropathy, unspecified' },
+    { code: 'E11.51', label: 'Type 2 diabetes mellitus with diabetic peripheral angiopathy without gangrene' }
+  ]},
+  'mild cognitive impairment': { code: null, desc: null, resolve: false, clarify: true, options: [
+    { code: 'G31.84', label: 'Mild cognitive impairment of uncertain or known etiology' },
+    { code: 'F06.70', label: 'Mild neurocognitive disorder due to known physiological condition without behavioral disturbance' },
+    { code: 'F06.71', label: 'Mild neurocognitive disorder due to known physiological condition with behavioral disturbance' }
+  ]},
+  'stress incontinence': { code: 'N39.3', desc: 'Stress incontinence (female) (male)', resolve: true },
+  'urge incontinence': { code: 'N39.41', desc: 'Urge incontinence', resolve: true },
+  'mixed incontinence': { code: 'N39.46', desc: 'Mixed incontinence', resolve: true },
+  'incontinence of urine': { code: 'R32', desc: 'Unspecified urinary incontinence', resolve: true },
   // Exact-match overrides — these always resolve to a specific code
   'essential hypertension': { code: 'I10', desc: 'Essential (primary) hypertension', resolve: true },
   'hypertension': { code: 'I10', desc: 'Essential (primary) hypertension', resolve: true },
@@ -13244,6 +13464,15 @@ function fcCancel() {
 
 // ─── END F-CODE ENGINE ─────────────────────────────────────────────────────
 
+(function addIcdSynonymAliases(){
+  var T = LOCAL_ICD_SYNONYMS;
+  ['type 2 diabetes','type ii diabetes','type ii diabetes mellitus','diabetes mellitus type 2','diabetes mellitus type ii',
+   'diabetes type 2','dm2','dm 2','dm ii','t2dm','niddm','type 2 dm','dm type 2'].forEach(function(k){ T[k] = T['type 2 diabetes mellitus']; });
+  ['mci','mild cognitive impairment so stated','mild neurocognitive disorder'].forEach(function(k){ T[k] = T['mild cognitive impairment']; });
+  ['urinary stress incontinence'].forEach(function(k){ T[k] = T['stress incontinence']; });
+  ['overactive bladder with incontinence'].forEach(function(k){ T[k] = T['urge incontinence']; });
+})();
+
 function localIcdLookup(diagnosis, hasCancerContext) {
   var norm = normalizeForLookup(diagnosis);
   var orig = diagnosis.toLowerCase().trim();
@@ -13286,15 +13515,28 @@ function localIcdLookup(diagnosis, hasCancerContext) {
   // appearing anywhere inside a longer sentence (pasted paragraph, or a short run-on line
   // joining several conditions with "with"/"and"/"plus") can't silently hijack the whole
   // line and discard everything else that was documented.
+  // Oct 2026: previously the FIRST key found anywhere in the line won, so a generic key
+  // ("incontinence") hijacked specific lines ("stress incontinence", "incontinence of urine")
+  // and offered the wrong family (bowel). Now: the LONGEST matching key wins, and it is only
+  // trusted if every other meaningful word in the line is a harmless filler word. Anything
+  // with an extra clinical qualifier goes to the AI instead of being guessed locally.
   var origWordCount = orig.split(/\s+/).filter(Boolean).length;
   if (origWordCount <= 8) {
+    var HARMLESS = { unspecified:1, chronic:1, acute:1, history:1, hx:1, known:1, dx:1, diagnosis:1, disease:1, disorder:1, condition:1, other:1, the:1, of:1, pt:1, patient:1, noted:1, current:1, active:1 };
     var synKeys = Object.keys(LOCAL_ICD_SYNONYMS);
+    var bestKey = null;
     for (var i = 0; i < synKeys.length; i++) {
       var key = synKeys[i];
       if (key.length > 6 && (orig.indexOf(key) !== -1 || norm.indexOf(key) !== -1)) {
         if (lineLikelyHasMultipleConcepts(norm, key)) { continue; }
-        return LOCAL_ICD_SYNONYMS[key];
+        if (!bestKey || key.length > bestKey.length) bestKey = key;
       }
+    }
+    if (bestKey) {
+      var keyWords = normalizeForLookup(bestKey).split(' ');
+      var extra = norm.split(' ').filter(function(w) { return w && keyWords.indexOf(w) === -1 && !HARMLESS[w] && !/^\d+$/.test(w); });
+      if (extra.length === 0) return LOCAL_ICD_SYNONYMS[bestKey];
+      // else: line says more than the key does — let the AI code it precisely
     }
   }
 
@@ -13331,6 +13573,76 @@ function localIcdLookup(diagnosis, hasCancerContext) {
   return null; // send to API
 }
 
+// Pull the JSON object out of an AI reply even if it added a sentence or code fence around it.
+function icdParseAiJson(rawText) {
+  var t = String(rawText || '').replace(/```json|```/g, '').trim();
+  try { return JSON.parse(t); } catch (e) {}
+  var a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a !== -1 && b > a) return JSON.parse(t.slice(a, b + 1));
+  throw new Error('No JSON in AI response');
+}
+
+// ── "Not right? Ask AI" — per-line second opinion ─────────────────────
+// Sends ONLY the diagnosis text for that one line (no patient identifiers) and replaces
+// the line's choices with the AI's best 2-6 candidate codes for the nurse to pick from.
+async function icdAskAiForLine(idx, btnEl) {
+  var item = icdLookupResults[idx];
+  if (!item) return;
+  var orig = btnEl ? btnEl.textContent : '';
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ Asking AI…'; }
+  var prompt = 'You are a hospice clinical coding expert. A hospice nurse entered this diagnosis and needs the correct ICD-10-CM code.'
+    + '\n\nDiagnosis: "' + item.diagnosis + '"'
+    + (item.code ? '\nThe code currently suggested is ' + item.code + ' and the nurse says it may be wrong.' : '')
+    + '\n\nReturn the 2-6 most likely valid, billable ICD-10-CM codes, most likely first. Interpret nurse shorthand (DM2, CHF, COPD, MCI, etc.). Never fabricate codes. Never return an empty list.'
+    + '\nFor dementia, return the etiology code (G30.x, G31.x, etc.), not F-codes. Never use G89.3 unless the text ties pain to cancer.'
+    + '\n\nRespond ONLY with JSON: {"options":[{"code":"E11.9","label":"Type 2 diabetes mellitus without complications"}]}';
+  try {
+    var resp = await fetch('/.netlify/functions/claude', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ prompt: prompt, max_tokens: 800 }) });
+    var data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || ('HTTP ' + resp.status));
+    var parsed = icdParseAiJson(data.content && data.content[0] && data.content[0].text);
+    var opts = (parsed.options || []).map(function(o) {
+      return { code: String(o.code || '').toUpperCase().trim(), label: o.label || o.description || o.name || '' };
+    }).filter(function(o) { return /^[A-Z][0-9][0-9A-Z](\.[0-9A-Z]{1,4})?$/.test(o.code) && o.label; });
+    if (!opts.length) throw new Error('AI returned no usable codes');
+    item.options = opts;
+    item.source = 'api';
+    item.code = null; item.description = null;
+    reopenIcdOption(idx); // re-renders the line as a pick-list with these options
+  } catch (e) {
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = orig; }
+    alert('AI could not suggest codes for this line right now (' + e.message + '). Try again, or use "Other — enter code manually".');
+  }
+}
+
+// Official-style name for a resolved line: the code description, cleaned of
+// "(CODE)" suffixes and guidance text after an em dash; falls back to the nurse's text.
+function icdOfficialName(item) {
+  var d = String(item.description || '').replace(/\s*\([A-Z][0-9][0-9A-Z.]*\)\s*$/, '');
+  d = d.split(' — ')[0].trim();
+  return d || item.diagnosis;
+}
+
+// ── Copy-ready list at the top of Problem List Tiering ──────────────────
+function renderTierFirenoteList() {
+  var box = document.getElementById('tier-fn-list');
+  if (!box) return;
+  var items = icdLookupResults.filter(function(r) { return r.code && r.code !== '__manual__'; });
+  if (!items.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  var primary = icdPrimaryIdx >= 0 ? icdLookupResults[icdPrimaryIdx] : null;
+  var ordered = primary && primary.code ? [primary].concat(items.filter(function(r) { return r !== primary; })) : items;
+  var seenCodes = {};
+  ordered = ordered.filter(function(r) { var k = r.code.toUpperCase(); if (seenCodes[k]) return false; seenCodes[k] = 1; return true; }); // Firenote takes each code once
+  var lines = ordered.map(function(r) { return r.code + ' - ' + icdOfficialName(r); });
+  box.innerHTML = '<div class="tfl-hd"><div><strong>📋 Diagnosis list for Firenote</strong>'
+    + '<span>' + lines.length + ' diagnoses from ICD-10 Lookup' + (primary ? ' · primary listed first' : '') + '</span></div>'
+    + '</div>'
+    + '<ol class="tfl-list">' + ordered.map(function(r, i) {
+        return '<li><span class="tfl-text"><b>' + escapeHtml(r.code) + '</b> - ' + escapeHtml(icdOfficialName(r)) + (r === primary ? ' <em>⭐ Primary</em>' : '') + '</span></li>';
+      }).join('') + '</ol>';
+  box._lines = lines;
+  box.style.display = 'block';
+}
 async function runIcdLookup() {
   const raw = document.getElementById('icd-lookup-input').value.trim();
   if (!raw) { alert('Please enter at least one diagnosis.'); return; }
@@ -13374,10 +13686,10 @@ async function runIcdLookup() {
   var apiBatchErrors = [];
   if (needsApi.length > 0) {
     btn.textContent = '\u23f3 Coding ' + needsApi.length + ' remaining via AI...';
-    const ICD_API_KEY_RULES = '\n\nKEY RULES:\n- CHRONIC RESP FAILURE: J96.10/J96.11/J96.12 only. J96.2x = acute-on-chronic.\n- ATRIAL FIB: I48.91/I48.0/I48.11/I48.19/I48.20 only. Never invent sub-codes.\n- CONSTIPATION: K59.00/K59.01/K59.02/K59.09. K59.1x does NOT exist.\n- PRESSURE INJURIES (L89): Elbow=L89.0xx. Back(non-sacral)=L89.1xx. Sacrum=L89.15x specifically. Hip=L89.2xx. Buttock=L89.3xx. Ankle=L89.5xx. Heel=L89.6xx. Never confuse ankle(L89.5) with heel(L89.6), or hip(L89.2) with either.\n- LACERATIONS / SKIN TEARS / ABRASIONS ARE NOT PRESSURE INJURIES: these are acute traumatic wounds and must use Chapter 19 injury S-codes by body region (e.g. S51.8xx for forearm, S81.8xx for lower leg, S91.3xx for foot), NEVER L89 (pressure ulcer) or L97/L98.4 (chronic ulcer) codes, even when the site overlaps a common pressure-ulcer site like the heel or sacrum. A skin tear defaults to "laceration without foreign body" at the specific site with a 7th character of A (initial encounter) unless the diagnosis text says otherwise; if the site is not specific enough to code, return needsClarification:true rather than guessing a pressure ulcer code.\n- PATHOLOGICAL FRACTURE: M84.451x=neoplastic. M84.551x=other disease. M84.651x=osteoporosis. M84.751x=unspecified. Never swap labels.\n- PROTEIN CALORIE MALNUTRITION: E44.0=MODERATE. E44.1=MILD. E43=severe. E44.2 does NOT exist.\n- FALL RISK: Always needsClarification:true. R29.6=active risk. Z91.81=history only.\n- ASPIRATION RISK: Never Z91.81. Never duplicate dysphagia code. Clarify R13.10 vs J69.0.\n- SUNDOWNING: R41.83 only. Never F05.9.\n- GENERALIZED WEAKNESS: R53.1 only. Never R53.81 or M62.81.\n- NEUROCOGNITIVE: G31.1=senile degeneration only. For Alzheimers/Parkinsons/Lewy Body/FTD/vascular dementia -- return the etiology code (G30.x, G20, G31.83, etc.) only. Do NOT suggest F-codes -- these are handled by a separate tool. If you see a dementia diagnosis without an etiology code, return needsClarification:true.\n- PAIN: Never default generic/unspecified pain ("chronic pain", "persistent pain", "generalized pain") to G89.3. G89.3 (Neoplasm related pain) requires the diagnosis text to explicitly tie the pain to a malignancy (e.g. "cancer pain", "tumor pain", "neoplasm related pain"). Otherwise use G89.29 (other chronic pain) or G89.4 (chronic pain syndrome) as appropriate, or needsClarification:true if genuinely ambiguous.\n- MULTI-DIAGNOSIS LINE: If a single line is a run-on sentence describing more than one distinct clinical condition (e.g. "CHF with edema and dyspnea as well as malnutrition and chronic pain"), do NOT silently pick just one. Return needsClarification:true with options listing each distinct condition you identified as its own {code, label} pair (label should name the specific condition, e.g. "Congestive heart failure \u2014 should be its own line" / "Malnutrition \u2014 should be its own line"), so the nurse can split the line into separate diagnoses rather than losing the others.\n- Never fabricate codes. If uncertain, flag needsClarification:true.\n\n';
-    const ICD_API_JSON_SPEC = '\n\nIMPORTANT: When needsClarification is true, options MUST be an array of objects with exactly two fields: "code" and "label" (NOT "description", NOT "name"). Example: [{"code":"I50.22","label":"Chronic systolic CHF, unspecified"},{"code":"I50.32","label":"Chronic diastolic CHF, unspecified"}]\n\nRespond ONLY with valid JSON:\n{"results":[{"diagnosis":"congestive heart failure","code":null,"description":null,"needsClarification":true,"options":[{"code":"I50.22","label":"Chronic systolic CHF, unspecified"},{"code":"I50.32","label":"Chronic diastolic CHF, unspecified"},{"code":"I50.9","label":"CHF unspecified"}]},{"diagnosis":"exact text","code":"I10","description":"Essential hypertension","needsClarification":false,"options":null}]}';
+    const ICD_API_KEY_RULES = '\n\nKEY RULES:\n- CHRONIC RESP FAILURE: J96.10/J96.11/J96.12 only. J96.2x = acute-on-chronic.\n- ATRIAL FIB: I48.91/I48.0/I48.11/I48.19/I48.20 only. Never invent sub-codes.\n- CONSTIPATION: K59.00/K59.01/K59.02/K59.09. K59.1x does NOT exist.\n- PRESSURE INJURIES (L89): Elbow=L89.0xx. Back(non-sacral)=L89.1xx. Sacrum=L89.15x specifically. Hip=L89.2xx. Buttock=L89.3xx. Ankle=L89.5xx. Heel=L89.6xx. Never confuse ankle(L89.5) with heel(L89.6), or hip(L89.2) with either.\n- LACERATIONS / SKIN TEARS / ABRASIONS ARE NOT PRESSURE INJURIES: these are acute traumatic wounds and must use Chapter 19 injury S-codes by body region (e.g. S51.8xx for forearm, S81.8xx for lower leg, S91.3xx for foot), NEVER L89 (pressure ulcer) or L97/L98.4 (chronic ulcer) codes, even when the site overlaps a common pressure-ulcer site like the heel or sacrum. A skin tear defaults to "laceration without foreign body" at the specific site with a 7th character of A (initial encounter) unless the diagnosis text says otherwise; if the site is not specific enough to code, return needsClarification:true rather than guessing a pressure ulcer code.\n- PATHOLOGICAL FRACTURE: M84.451x=neoplastic. M84.551x=other disease. M84.651x=osteoporosis. M84.751x=unspecified. Never swap labels.\n- PROTEIN CALORIE MALNUTRITION: E44.0=MODERATE. E44.1=MILD. E43=severe. E44.2 does NOT exist.\n- FALL RISK: Always needsClarification:true. R29.6=active risk. Z91.81=history only.\n- ASPIRATION RISK: Never Z91.81. Never duplicate dysphagia code. Clarify R13.10 vs J69.0.\n- SUNDOWNING: R41.83 only. Never F05.9.\n- GENERALIZED WEAKNESS: R53.1 only. Never R53.81 or M62.81.\n- NEUROCOGNITIVE: G31.1=senile degeneration only. For Alzheimers/Parkinsons/Lewy Body/FTD/vascular dementia -- return the etiology code (G30.x, G20, G31.83, etc.) only. Do NOT suggest F-codes -- these are handled by a separate tool. If you see a dementia diagnosis without an etiology code, return needsClarification:true.\n- PAIN: Never default generic/unspecified pain ("chronic pain", "persistent pain", "generalized pain") to G89.3. G89.3 (Neoplasm related pain) requires the diagnosis text to explicitly tie the pain to a malignancy (e.g. "cancer pain", "tumor pain", "neoplasm related pain"). Otherwise use G89.29 (other chronic pain) or G89.4 (chronic pain syndrome) as appropriate, or needsClarification:true if genuinely ambiguous.\n- MULTI-DIAGNOSIS LINE: If a single line is a run-on sentence describing more than one distinct clinical condition (e.g. "CHF with edema and dyspnea as well as malnutrition and chronic pain"), do NOT silently pick just one. Return needsClarification:true with options listing each distinct condition you identified as its own {code, label} pair (label should name the specific condition, e.g. "Congestive heart failure \u2014 should be its own line" / "Malnutrition \u2014 should be its own line"), so the nurse can split the line into separate diagnoses rather than losing the others.\n- ABBREVIATIONS / LAY TERMS: Nurses type shorthand (DM2, T2DM, CHF, COPD, CKD3, MCI, UTI, HTN, A-fib, BPH, OA, PVD). Interpret them clinically and code them; never treat shorthand as unknown.\n- NEVER return an empty result. If you cannot pick one code with confidence, return needsClarification:true with the 2-6 most likely codes as options. A diagnosis with code:null and no options is not allowed.\n- Never fabricate codes. If uncertain, flag needsClarification:true.\n\n';
+    const ICD_API_JSON_SPEC = '\n\nIMPORTANT: When needsClarification is true, options MUST be an array of objects with exactly two fields: "code" and "label" (NOT "description", NOT "name"). Example: [{"code":"I50.22","label":"Chronic systolic CHF, unspecified"},{"code":"I50.32","label":"Chronic diastolic CHF, unspecified"}]\n\nEach result MUST include "line": the number of the diagnosis as listed above, and "diagnosis": the text exactly as given.\n\nRespond ONLY with valid JSON:\n{"results":[{"line":1,"diagnosis":"congestive heart failure","code":null,"description":null,"needsClarification":true,"options":[{"code":"I50.22","label":"Chronic systolic CHF, unspecified"},{"code":"I50.32","label":"Chronic diastolic CHF, unspecified"},{"code":"I50.9","label":"CHF unspecified"}]},{"line":2,"diagnosis":"exact text","code":"I10","description":"Essential hypertension","needsClarification":false,"options":null}]}';
 
-    const ICD_API_BATCH_SIZE = 8;
+    const ICD_API_BATCH_SIZE = 5; // smaller batches = faster responses, well inside the function time limit
     const batches = [];
     for (let bi = 0; bi < needsApi.length; bi += ICD_API_BATCH_SIZE) {
       batches.push(needsApi.slice(bi, bi + ICD_API_BATCH_SIZE));
@@ -13394,14 +13706,39 @@ async function runIcdLookup() {
           const data = await resp.json();
           if (data.error) { errMsg = String(data.error).slice(0, 200); } else {
             const rawText = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
-            try { parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim()); } catch (e) { errMsg = 'Parse error: ' + e.message; }
+            try { parsed = icdParseAiJson(rawText); } catch (e) { errMsg = 'Parse error: ' + e.message; }
           }
         }
       } catch (e) { errMsg = 'Network error: ' + e.message; }
       return { batchLines: batchLines, parsed: parsed, errMsg: errMsg };
     }
 
+    function recordIcdBatch(outcome) {
+      if (!(outcome.parsed && outcome.parsed.results)) return;
+      outcome.parsed.results.forEach(function(r, ri) {
+        // Match by line number first (robust to the AI rewording the diagnosis text),
+        // then by position for single-line calls.
+        var n = parseInt(r.line, 10);
+        var src = (n >= 1 && n <= outcome.batchLines.length) ? outcome.batchLines[n - 1]
+                : (outcome.batchLines.length === 1 ? outcome.batchLines[0] : null);
+        if (src && !apiResults[src]) { apiResults[src] = Object.assign({}, r, { diagnosis: src }); apiResults[src.toLowerCase()] = apiResults[src]; }
+      });
+    }
+
     const batchOutcomes = await Promise.all(batches.map(runIcdApiBatch));
+    batchOutcomes.forEach(recordIcdBatch);
+
+    // Automatic second pass: any line still missing (timeout, bad JSON, skipped by the AI)
+    // is retried on its own, all in parallel, before anything is shown as "not found".
+    var missingAfterFirst = needsApi.filter(function(l) { return !apiResults[l]; });
+    if (missingAfterFirst.length > 0) {
+      btn.textContent = '\u23f3 Re-checking ' + missingAfterFirst.length + ' with AI...';
+      const retryOutcomes = await Promise.all(missingAfterFirst.map(function(l) { return runIcdApiBatch([l]); }));
+      retryOutcomes.forEach(recordIcdBatch);
+      // Only lines that failed BOTH passes are reported as errors below.
+      batchOutcomes.length = 0;
+      retryOutcomes.forEach(function(o) { batchOutcomes.push(o); });
+    }
 
     batchOutcomes.forEach(function(outcome) {
       if (outcome.parsed && outcome.parsed.results) {
@@ -14132,6 +14469,8 @@ function sendIcdToTierChecker() {
       const input = document.getElementById('tier-input');
       if (input) { input.value = diagList; input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 
+      renderTierFirenoteList();
+
       if (primaryItem) {
         const primaryField = document.getElementById('tier-primary');
         if (primaryField) {
@@ -14144,7 +14483,8 @@ function sendIcdToTierChecker() {
 }
 
 function icdPrimaryBtnHtml(idx) {
-  var removeBtn = '<button onclick="removeIcdLookupItem(' + idx + ')" title="Remove this line" style="font-size:.75rem;color:#c0392b;background:none;border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;font-family:inherit;font-weight:600;margin-left:6px">🗑 Remove</button>';
+  var askAiBtn = '<button onclick="icdAskAiForLine(' + idx + ', this)" title="Code looks wrong or missing? Get AI-suggested options for this line" style="font-size:.75rem;color:#5b3fa0;background:#f4f1fb;border:1px solid #d7cdef;border-radius:5px;padding:2px 8px;cursor:pointer;font-family:inherit;font-weight:600;margin-left:6px">🤖 Not right? Ask AI</button>';
+  var removeBtn = askAiBtn + '<button onclick="removeIcdLookupItem(' + idx + ')" title="Remove this line" style="font-size:.75rem;color:#c0392b;background:none;border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;font-family:inherit;font-weight:600;margin-left:6px">🗑 Remove</button>';
   if (icdPrimaryIdx === idx) {
     return '<span style="font-size:.7rem;background:var(--navy);color:#fff;padding:1px 8px;border-radius:10px;font-weight:700">⭐ PRIMARY</span>'
       + '<button onclick="markIcdPrimary(-1)" style="font-size:.72rem;color:var(--text-lt);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;font-family:inherit">✕ Unmark</button>'
@@ -14493,8 +14833,7 @@ Example: 82yo male, end-stage CHF, lives with daughter who is primary caregiver.
 
       <div style="margin-top:18px;border-top:2px solid var(--border);padding-top:18px">
         <div style="font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:6px">📋 Step 2 — Paste Copilot's Output Here</div>
-        <div class="alert info" style="margin-bottom:10px;font-size:.82rem"><span>✂️</span><div>Paste <strong>only the narrative</strong> from Copilot — stop before the <code style="background:#e8edf8;padding:1px 5px;border-radius:3px">--- ELEMENT CHECKLIST ---</code> separator line. The checklist will appear automatically below. Do not paste the checklist section into Firenote.</div></div>
-        <textarea id="narr-paste-back" style="width:100%;min-height:200px;padding:10px 13px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.87rem;resize:vertical;outline:none;line-height:1.6" placeholder="Paste Copilot's narrative output here. Edit it to reflect your clinical language and judgment before copying into Firenote..." oninput="handleNarrativePasteBack()" onpaste="setTimeout(handleNarrativePasteBack, 50)"></textarea>
+        <textarea id="narr-paste-back" style="width:100%;min-height:200px;padding:10px 13px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.87rem;resize:vertical;outline:none;line-height:1.6" placeholder="Paste Copilot's full response here — the element checklist is pulled out automatically. Edit the narrative to reflect your clinical language and judgment before copying into Firenote..." oninput="handleNarrativePasteBack()" onpaste="setTimeout(handleNarrativePasteBack, 50)"></textarea>
 
         <div id="narr-meta-warning" style="display:none;margin-top:10px;padding:10px 14px;background:#fdf2f1;border:2px solid #c0392b;border-radius:7px;font-size:.83rem;color:#7a2020;line-height:1.55"></div>
 
@@ -14641,4 +14980,74 @@ Example: 82yo male, end-stage CHF, lives with daughter who is primary caregiver.
   table.dtable{min-width:0;max-width:100%}
 }
 </style>
+<style id="split-view-mode">
+/* ── SIDE-BY-SIDE WITH FIRENOTE (optional) ───────────────────────────
+   Button opens split-test.html (Firenote + this tool in one window).
+   When this tool is loaded inside that page, html gets .in-split:
+   button hidden, header slimmed so more of the tool fits. */
+.split-open-btn{margin-left:auto;flex-shrink:0;min-height:40px;padding:0 14px;border-radius:6px;border:1.5px solid var(--gold);background:rgba(201,151,44,.15);color:#fff;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.split-open-btn:hover{background:rgba(201,151,44,.3)}
+@media(max-width:700px){.split-open-btn{display:none}} /* too narrow for two panes */
+html.in-split .split-open-btn{display:none}
+html.in-split .hdr-top{padding:4px 12px}
+html.in-split .hdr-logo{width:26px;height:26px}
+html.in-split .hdr-text h1{font-size:.85rem}
+
+/* Radio buttons & checkboxes must never inherit the text-field "width:100%" rule from
+   .checker-field / .ai-field. Chrome quietly ignores it inside these pill labels, but Safari
+   (iPad) stretches the circle across the pill and shoves the icon and label text aside. */
+.checker-field input[type=radio],.checker-field input[type=checkbox],
+.ai-field input[type=radio],.ai-field input[type=checkbox],
+.checker-section input[type=radio],.checker-section input[type=checkbox],
+.ai-tool-body input[type=radio],.ai-tool-body input[type=checkbox]{
+  width:auto;min-width:0;padding:0;margin:0;border:none;box-shadow:none;flex:0 0 auto;-webkit-appearance:auto;appearance:auto}
+
+/* "Show different intervention options" */
+.more-iv{margin-top:10px;padding:10px;border:1px dashed #d7cdef;border-radius:7px;background:#faf8fe}
+.more-iv-row{display:flex;gap:8px;flex-wrap:wrap}
+.more-iv-focus{flex:1 1 220px;min-height:40px;padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.85rem}
+.more-iv-btn{min-height:40px;padding:0 14px;background:#5b3fa0;color:#fff;border:none;border-radius:6px;font-family:inherit;font-weight:700;font-size:.84rem;cursor:pointer}
+.more-iv-btn:disabled{opacity:.6;cursor:wait}
+.more-iv-grp{margin-top:10px}
+.more-iv-hd{font-size:.72rem;font-weight:700;color:#5b3fa0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+
+/* Copy-ready "ICD-10 - Diagnosis Name" list at top of Problem List Tiering */
+.tier-fn-list{background:#fff;border:2px solid var(--navy);border-radius:8px;margin-bottom:16px;overflow:hidden}
+.tier-fn-list .tfl-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--navy);color:#fff;padding:10px 14px}
+.tier-fn-list .tfl-hd strong{display:block;font-size:.95rem}
+.tier-fn-list .tfl-hd span{font-size:.74rem;color:rgba(255,255,255,.65)}
+.tier-fn-list .tfl-list{margin:0;padding:6px 14px 8px 38px}
+.tier-fn-list li{padding:6px 0;border-bottom:1px solid var(--border-lt);font-size:.9rem;color:var(--text)}
+.tier-fn-list li:last-child{border-bottom:none}
+.tier-fn-list li{display:list-item}
+.tier-fn-list .tfl-text{display:inline}
+.tier-fn-list .tfl-text b{font-family:monospace;color:var(--navy)}
+.tier-fn-list .tfl-text em{font-style:normal;font-size:.72rem;background:var(--navy);color:#fff;padding:1px 7px;border-radius:10px;margin-left:4px}
+</style>
+<script id="split-view-mode-js">
+(function(){
+  // Are we the tool pane inside the split page? Same-origin check only —
+  // nothing from Firenote is read (the browser blocks that anyway).
+  try{
+    if (window.top !== window.self && /split-test\.html/.test(window.top.location.pathname)) {
+      document.documentElement.classList.add('in-split');
+    }
+  }catch(e){ /* framed by another site — leave normal layout */ }
+})();
+// True if the nurse has typed or checked anything that a reload would wipe.
+function toolHasEnteredData(doc){
+  doc = doc || document;
+  const fields = doc.querySelectorAll('input:not([type=search]):not([type=button]):not([type=submit]), textarea, select');
+  for (const el of fields) {
+    if (el.type === 'checkbox' || el.type === 'radio') { if (el.checked !== el.defaultChecked) return true; }
+    else if (el.tagName === 'SELECT') { if (el.selectedIndex > 0 && !el.options[el.selectedIndex].defaultSelected) return true; }
+    else if (el.value.trim() && el.value !== el.defaultValue) return true;
+  }
+  return false;
+}
+function openFirenoteSplit(){
+  if (toolHasEnteredData() && !confirm('Switching to side-by-side view restarts the tool, so anything you have entered or checked here will be cleared.\n\nTip: choose your view at the start of the admission.\n\nSwitch now?')) return;
+  window.location.href = 'split-test.html';
+}
+</script>
 </body>
