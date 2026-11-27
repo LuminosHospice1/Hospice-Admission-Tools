@@ -9268,64 +9268,53 @@ function buildNarrativePrompt() {
   const narrMin = Math.max(100, Math.round(narrMax * 0.6));
   const narrTarget = narrMin + '–' + narrMax + ' words';
 
-  const prompt = `You are an expert hospice clinical documentation specialist with deep knowledge of CMS hospice benefit standards, 42 CFR §418, LCD requirements, MAC audit guidance, and NHPCO guidelines.
+  // Nov 2026: Copilot cuts off long pastes. The old ~9,500-character instruction block plus a
+  // long draft got truncated mid-draft (Copilot then reported half the visit as "missing").
+  // Instructions are now compact, the response format comes BEFORE the draft, and the draft
+  // ends with a marker so Copilot can tell us if it was cut off.
+  const prompt = `You are a hospice clinical documentation specialist. Rewrite this hospice admission nurse's draft into a stronger admission narrative, then check it for required elements.
 
-A hospice admission nurse needs help tightening up her admission narrative. Please:
-1. Rewrite it so it reads like a skilled, experienced hospice RN wrote it herself at the end of the visit — clear, specific, and believable to an auditor as genuine nurse charting (see LENGTH AND VOICE RULES below)
-2. Make sure each of these required hospice admission elements that IS in the draft comes through clearly (routine items like medication review, verbal certification, and IDG coordination need only one short sentence each; the depression screening must state that depression was addressed AND the outcome, e.g. "denied feelings of depression or hopelessness; no observable signs of depression" or "unable to participate; no observable signs, caregiver reports no concerns" — never name or add a screening tool the nurse did not use):
-   - Patient and caregiver identification and relationship
-   - Primary diagnosis and related conditions with symptom burden
-   - LCD criteria documentation (functional decline, clinical indicators supporting 6-month prognosis)
-   - Pain assessment findings (scale, location, character, current management)
-   - Medication review (hospice-covered medications, supplies, and DME reviewed with patient/family/legal representative)
-   - Depression screening addressed, with the outcome
-   - Verbal certification status (obtained, or transfer patient exception noted)
-   - IDG coordination statement
-   - Goals of care and patient/family understanding of hospice philosophy
-3. Return a checklist showing each element above as PRESENT, PARTIAL, or MISSING with a brief note. DEPRESSION: mark it PRESENT whenever the draft says depression/mood was addressed and gives the outcome (e.g. patient denied depression, no observable signs, unable to participate with caregiver report). NEVER ask for, suggest, or mark PARTIAL for a named screening tool (PHQ-2, PHQ-9, GDS or any other), a score, or a scale — none is required. Do NOT add a checklist line for symptom screening / symptom impact assessment — that is documented in the structured section of the Firenote note, not required in the narrative. (Symptom findings that ARE in the draft still belong in the narrative.)
+RULES FOR THE NARRATIVE
+- Real rewrite, not a copy edit. Organize into short paragraphs (skip any with nothing documented): 1) pt, primary dx, related conditions, living situation/caregiver; 2) decline then vs. now — function/ADLs, ambulation, falls, hospitalizations, weight, intake, PPS/FAST/KPS/NYHA — ending with ONE plain trend sentence built from those facts; 3) today's assessment — findings, vitals, symptoms with severity, pain, comfort meds and effect, DME; 4) goals and plan — goals, code status, education, hospice understanding, med review, verbal cert, depression outcome, IDG/services, MD notification.
+- Keep EVERY fact, number and score in the draft (PPS/FAST/NYHA, ADL assist level, weights, MAC, intake, vitals, hospitalizations with dates, comorbidities, labs/EF, pain score/location/character/relief, comfort meds, DME, falls, sleep, skin, education). Cut words, never facts — go over the target length rather than drop one.
+- Sharpen with documented facts only: precise clinical terms; do the math the draft supports (weight loss in lb AND %, over the stated time; PPS change; number of hospitalizations in the period). If the draft gives a caveat (e.g. weight affected by fluid), keep it.
+- Never add anything not in the draft — no new symptoms, negatives, findings, education or tools. Never write that something is missing, not documented, or not done (e.g. "pain was not re-rated") — even if the draft says so; gaps go ONLY in the checklist.
+- Depression: state it was addressed and the outcome in the nurse's words; never name or add a screening tool.
+- Voice: first person, past tense, plain direct sentences the way an experienced hospice RN charts ("I met with pt and husband…", "Pt reports…"). Nursing abbreviations are fine. Keep each paragraph under about 120 words — split a long one (e.g. function/ADLs vs. nutrition/weight). Don't open with "I admitted this [age]-year-old…". Target ${narrTarget}.
+- Avoid AI-sounding words (comprehensive, holistic, robust, notably, furthermore, additionally, moreover, demonstrates, underscores, highlights, ensuring, journey) and any regulatory language (CMS, LCD, Medicare, eligibility, "prognosis of 6 months or less").
 
-CRITICAL — DO NOT WRITE ABOUT GAPS INSIDE THE NARRATIVE ITSELF: The STRENGTHENED NARRATIVE section must describe ONLY what actually happened during the visit and what was actually assessed or documented in the draft notes below. NEVER write sentences in the narrative stating that something "was not included," "was not documented," "should be completed," "is missing from the notes," or similar — that kind of statement must NEVER appear inside the narrative text, because this narrative may be copied directly into the permanent clinical record, and a sentence documenting that documentation is missing becomes a compliance liability once it's in the chart. If an element is missing or incomplete, simply omit any mention of it from the narrative and instead flag it ONLY in the ELEMENT CHECKLIST section below, marked MISSING or PARTIAL. The narrative and the checklist serve different purposes: the narrative describes the visit as documented; the checklist tells the nurse what still needs follow-up before this narrative can be considered complete.
-
-LENGTH AND VOICE RULES — THESE MATTER AS MUCH AS CONTENT:
-- KEEP EVERY PROGNOSTIC FACT — THIS OUTRANKS LENGTH: Never drop a fact to save words. Cut wording, not facts. Every one of these that appears in the input MUST appear in the narrative:
-  • functional scores (PPS, FAST, KPS, NYHA) and ADL dependence / assist level
-  • weights, weight loss (amount + timeframe), MAC, intake
-  • vital signs — one compact line is fine (e.g. "VS: BP 170/70, HR 65, RR 18, SpO2 97% RA, T 98.0, wt 125 lb")
-  • hospitalizations, ED visits, infections, procedures, with dates
-  • every comorbidity or finding contributing to decline — especially masses, suspected malignancy, organ failure
-  • abnormal labs (values can be listed compactly)
-  • symptoms with severity/scores, pain location/character/score/goal
-  • comfort meds by name with purpose (a short list is fine), DME and supplies
-  • that depression was addressed and its outcome (keep the nurse's own description; do not name a screening tool)
-  • education provided and to whom, family understanding, MD/verbal cert, IDG
-- LENGTH: Target ${narrTarget}, achieved by tight wording — short sentences, compact lists, no repetition, no filler, no summarizing conclusions ("consistent with limited prognosis…"). If every fact above cannot fit, go over the target rather than drop a fact. Never pad a short draft with invented detail.
-- VOICE: First person, past tense, the way a nurse actually charts ("I met with pt and daughter at bedside…", "Pt reports…", "Daughter states…"). Plain, direct sentences of normal length. Common nursing abbreviations are fine where a nurse would use them (pt, CG, PRN, SOB, PPS, FAST, O2, BLE, hx).
-- FACTS OVER ADJECTIVES: Keep every number, score, and observation from the draft (weights, PPS/FAST/MAC, pain scores, intake, hospitalizations, falls). These carry the prognosis — not descriptive language.
-- DO NOT USE these phrasings, which read as AI-written: "comprehensive", "holistic", "robust", "multifaceted", "meticulous", "it is important to note", "notably", "furthermore", "additionally", "moreover", "demonstrates", "underscores", "highlights", "in alignment with", "ensuring", "in order to", "a testament to", "navigating", "journey", strings of 3+ adjectives, or sentences that restate the same point twice.
-- NO REGULATORY LANGUAGE IN THE NARRATIVE: never mention CMS, LCD, 42 CFR, Medicare criteria, "meets eligibility", or "supports a prognosis of six months or less" — describe the clinical findings and let them speak for themselves.
-- Do not add symptoms, negatives ("denies X, Y, Z…"), findings, or education that are not in the draft.
-
-TONE EXAMPLE (style only — do NOT copy any content from it):
-"I met with pt and her daughter (primary CG) at bedside. Pt is bedbound, PPS 30%, and has lost 12 lbs since August per daughter. She is eating 2–3 bites per meal and sleeps most of the day. Reported pain 4/10 to lower back, relieved with PRN morphine. Hospice philosophy, covered meds, and DME reviewed with daughter, who verbalized understanding and agreed with comfort-focused goals."
-
-PRIMARY HOSPICE DIAGNOSIS: ${dx || 'Not specified — infer from narrative'}
-
-DRAFT NARRATIVE / NOTES:
-${draft}
+CHECKLIST ELEMENTS (mark PRESENT, PARTIAL or MISSING from the full draft):
+Patient/caregiver identification and relationship · Primary dx and related conditions with symptom burden · Functional decline and clinical indicators of decline · Pain assessment (score, location, character, management) · Medication review (covered meds, supplies, DME with pt/family) · Depression addressed, with outcome (PRESENT whenever an outcome is given — never ask for a tool or score) · Verbal certification (or transfer exception) · IDG coordination · Goals of care and understanding of hospice philosophy. Do not add a line for symptom screening.
 
 FORMAT YOUR RESPONSE EXACTLY AS:
-
 STRENGTHENED NARRATIVE:
-[Rewritten narrative — about ${narrTarget} (facts first; never drop a documented fact to hit the length), 2–4 short paragraphs, no headers, no bullets, first-person past tense, written the way an experienced hospice RN actually charts. Describes ONLY what was actually documented/assessed. Contains NO commentary about missing, absent, or incomplete documentation — that belongs exclusively in the checklist below.]
-
+[the narrative — paragraphs only, no headers or bullets]
 ---
-
 ELEMENT CHECKLIST:
 ✅ PRESENT: [element] — [brief note]
-⚠️ PARTIAL: [element] — [what was there and what is still needed]
+⚠️ PARTIAL: [element] — [what is there / what is still needed]
 ❌ MISSING: [element] — [what needs to be added]
+SUMMARY: [one sentence]
 
-SUMMARY: [One sentence — either "All required elements are present" or list what still needs to be added before entry into Firenote]`;
+The draft below ends with the line END OF DRAFT. If you do not see that line, reply ONLY: "The draft was cut off — please paste it in two parts."
+
+PRIMARY HOSPICE DIAGNOSIS: ${dx || 'Not specified — infer from the draft'}
+
+DRAFT:
+${draft}
+END OF DRAFT`;
+
+  // Warn when the paste is long enough that Copilot may cut it off.
+  var _narrWarn = document.getElementById('narr-prompt-length-warn');
+  if (!_narrWarn) {
+    _narrWarn = document.createElement('div'); _narrWarn.id = 'narr-prompt-length-warn';
+    _narrWarn.style.cssText = 'display:none;margin:8px 0;padding:9px 12px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;font-size:.82rem;color:#7a4200;line-height:1.5';
+    var _po = document.getElementById('narr-prompt-output'); if (_po && _po.parentNode) _po.parentNode.insertBefore(_narrWarn, _po);
+  }
+  if (prompt.length > 9000) {
+    _narrWarn.innerHTML = '<strong>⚠ This prompt is long (' + prompt.length.toLocaleString() + ' characters).</strong> Copilot may cut off the end of your draft. If Copilot replies that the draft was cut off — or its checklist marks things missing that ARE in your draft — shorten the draft (remove repeated details) and run it again.';
+    _narrWarn.style.display = 'block';
+  } else { _narrWarn.style.display = 'none'; }
 
   const outputEl = document.getElementById('narr-prompt-output');
   const outputWrap = document.getElementById('narr-output-wrap');
